@@ -1,18 +1,23 @@
 #!/usr/bin/python
 # coding: utf-8
 
-import popen2,socket, os, sys, re, platform, datetime, time
+import popen2, subprocess, socket, os, sys, re, platform, datetime, time
 
 
+so = platform.system()
+	if so == "Linux":
+		sep = '/'
+	else:
+		sep = '\\'
+user = "joopeeds"
 
 class Component:
 	def __init__(self, name, machine, conf, zipped_path):
         	self.__name = name
 		self.__machine = machine
 		self.__conf = conf
+		self.__zipped_path = zipped_path 
 
-	def process_name(self):
-        	return self.__process_name
 
 	def name(self):
         	return self.__name
@@ -23,7 +28,7 @@ class Component:
 	def machine(self):
         	return self.__machine
 
-	def execute(remote_command, user, machine_addr, delay=None):
+	def execute(remote_command, machine_addr, delay=None):
     		process = subprocess.Popen(" ".join(["ssh",
 	                                 user +"@" + machine_addr,
                                          remote_command]),
@@ -33,12 +38,12 @@ class Component:
    		out, err = process.communicate()
     		return out, err, process.returncode
 
-	def copy_zip(self, user, machine):
-        	remote_path = user+"@" + node + ":/tmp/"
+	def copy_zip(self,  machine):
+        	remote_path = user+"@" + machine + ":/tmp/"
         	getdata_cmd = " ".join(["scp", "-r",
         	                        zipped_path,
         	                        remote_path])
-		self.__zipped = zipped_path.split(sep)[-1]
+		self.__zipped = self.__zipped_path.split(sep)[-1]
         	process = subprocess.Popen(getdata_cmd,
                                    shell=True,
                                    stdout=subprocess.PIPE,
@@ -46,28 +51,69 @@ class Component:
         	out, err = process.communicate()
         	return out, err, process.returncode
 
+	def copy_files(self,  machine, src_path, dest_path):
+        	remote_path = user+"@" + machine + ":/"+dest_path
+        	getdata_cmd = " ".join(["scp", "-r",
+        	                        src_path,
+        	                        remote_path])
+        	process = subprocess.Popen(getdata_cmd,
+                                   shell=True,
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.STDOUT)
+        	out, err = process.communicate()
+        	return out, err, process.returncode
 
     	def mount():
-		copy_zip("joopeeds", machine())
-		execute("unzip /tmp/"+self.__zipped, "joopeeds", machine())
-		execute("rm /tmp/"+self.__zipped, "joopeeds", machine())
+		# Copy BeeFS zip
+		copy_zip(machine())
+		# Unzip the files of BeeFS
+		execute("unzip /tmp/"+self.__zipped, machine())
+		# Remove the zip, already unzipped
+		execute("rm /tmp/"+self.__zipped, machine())
+		# Copy the configuration file of component in remote machine that will run it
+		copy_files(machine(), self.conf, "tmp/"+self.__zipped+"/conf/"+name+".conf")
+		
+		if name is "honeycomb":
+			execute("mkdir "+conf["contributing_storage.directory"], machine())
+		else if name is "honeybee":
+			execute("mkdir "+conf["mount_directory"], machine())
+		
 		
 	def unmount():
 
 	def clear():
+		# Cleaning metadata of component to start a new test
+		if name is "queenbee":
+			execute("rm "+conf["metadata_directory"]+"/Queenbee.*", machine())
+		if name is "honeycomb":
+			execute("rm "+conf["contributing_storage.directory"]+"/*", machine())
+			execute("rm "+conf["metadata_directory"]+"/Honeycomb.*", machine())
+		
 	
 	def start():
+		def componentisrunning(self):
+        		out, err, rcod = execute("ps xau | grep " + 
+                              	   	name() + 
+                                 	 " | grep -v grep", machine())
+      		        return out #if it is running, out is not empty, so it's is true
+
+
+		execute("bash /tmp/"+self.__zipped+"/bin/beefs start "+name, machine())
+		return componentisrunning()
 
 	def stop():
+		def componentisrunning(self):
+        		out, err, rcod = execute("ps xau | grep " + 
+                              	   	name() + 
+                                 	 " | grep -v grep", machine())
+      		        return out #if it is running, out is not empty, so it's is true
+
+
+		execute("bash /tmp/"+self.__zipped+"/bin/beefs stop "+name, machine())
+		return componentisrunning()
 
 
 
-
-
-
-DATA_SERVER = Component("Honeycomb", "honeycomb")
-META_SERVER = Component("Queenbee", "queenbee")
-CLIENT = Component("Honeybee", "honeybee")
 
 
 
@@ -110,6 +156,36 @@ def openconf(file):
                         config[fn(" "+i)[0]] = fn(" "+i)[1]
         return config
 
+def opencomponentconf(file):
+
+	def fn(line):
+ 	   if line[0] == "#":
+ 	       line = ""
+ 	   else:
+ 	       idx = re.search (r"[^\\]#", line)
+ 	       if idx != None:
+ 	           line = line[:idx.start()+1]
+ 	   # Split non-comment into key and value.
+ 	   idx = re.search (r"=", line)
+ 	   if idx == None:
+  	      key = line
+  	      val = ""
+ 	   else:
+  	      key = line[:idx.start()]
+  	      val = line[idx.start()+1:]
+  	  val = val.replace ("\\#", "#")
+  	  return (key.strip(),val.strip())
+
+        config = []
+        new = open(file).read().split("[========]")
+	zipped_path = new[0]
+	for uni in range(1,len(new)):
+		config.append({})
+        	for i in new[uni].split('\n'):
+              	  if fn(" "+i)[0]!='':
+                        config[uni][fn(" "+i)[0]] = fn(" "+i)[1]
+        return zipped_path, config # returns the zip path that was in header of .conf and a list of dicts containing info confs
+
 def getsize(source):
 	folder_size = 0
 	for (path, dirs, files) in os.walk(source):
@@ -124,11 +200,7 @@ def generateheader(text):
 
 
 def main():
-	so = platform.system()
-	if so == "Linux":
-		sep = '/'
-	else:
-		sep = '\\'
+	
 
 	# this script must be in beefs directory where exists \conf  
 	honeybee = openconf('conf'+sep+'honeybee.conf')
@@ -146,11 +218,6 @@ def main():
 	else:
 		allocation = "Distributed"
 	mode = honeycomb['file_synchronization'] + allocation
-	#clear_storage = "rm -r "+honeycomb['contributing_storage.directory']+sep+'*'
-	#os.system(clear_storage)
-	#clear_metadata = "rm -r "+honeycomb['metadata_directory']+sep+'*'
-	#os.system(clear_metadata)
-
 	hostname = socket.gethostname()
 	size = getsize(source)
 	queenbee = honeycomb['osdmaster'].split(':')
@@ -171,15 +238,19 @@ def main():
 if __name__ == "__main__":
 
 	if len(sys.argv) != 1:
-       	 sys.stderr.write("Usage: python beefstester.py config_file\n")
-         sys.exit(-1)
+       	   sys.stderr.write("Usage: python beefstester.py config_file\n")
+           sys.exit(-1)
 
 	config_file = sys.argv[1]
 	#FIXME
-	zipped_path, samples, queenbee, queenbee_conf, honeycomb, honeycomb_conf, honeybee, honeybee_conf = openfile(config_file).values()
+	zipped_path, samples_config = opencomponentfile(config_file)
+	for sample_config in samples_config: # This things should be in main()
+		 samples, queenbee, queenbee_conf, honeycomb, honeycomb_conf, honeybee, honeybee_conf = sample_config.values()
+		 DATA_SERVER = Component("honeycomb", honeycomb, honeycomb_conf, zipped_path)
+		 META_SERVER = Component("queenbee", queenbee, queenbee_conf, zipped_path)
+		 CLIENT = Component("honeybee", honeybee, honeybee_conf, zipped_path)
+	#FIXME
+	main(samples_config, zipped_path)
 
-	main()
 
 
-#getStartime = 'date +%s%N\n'
-#getEndtime = 'date +%s%N'

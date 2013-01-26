@@ -1,4 +1,6 @@
-zip = super.zip
+zipped_path = super.zip
+
+[==== Test 1 ====]
 samples = 2
 queenbee = ourico
 queenbee_conf = queenbee.conf
@@ -6,5 +8,14 @@ honeycomb = abelhinha
 honeycomb_conf = honeycomb.conf
 honeybee = abelhinha
 honeybee_conf = honeybee.conf
-
+files_to_write = workload.zip
+[==== Test 2 ====]
+samples = 4
+queenbee = ourico
+queenbee_conf = queenbee2.conf
+honeycomb = abelhinha
+honeycomb_conf = honeycomb2.conf
+honeybee = abelhinha
+honeybee_conf = honeybee2.conf
+files_to_write = workload.zip
 
