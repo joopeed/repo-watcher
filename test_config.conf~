@@ -1,0 +1,10 @@
+zip = super.zip
+samples = 2
+queenbee = ourico
+queenbee_conf = queenbee.conf
+honeycomb = abelhinha
+honeycomb_conf = honeycomb.conf
+honeybee = abelhinha
+honeybee_conf = honeybee.conf
+
+
