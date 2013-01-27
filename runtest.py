@@ -52,6 +52,20 @@ class Component:
         	out, err = process.communicate()
         	return out, err, process.returncode
 
+	def copy_workload(self,  machine, workload_path):
+		# Copy the zip from the path given in test_config.conf
+        	remote_path = user+"@" + machine + ":/tmp/"
+        	getdata_cmd = " ".join(["scp", "-r",
+        	                        workload_path,
+        	                        remote_path])
+		workload = workload_path.split(sep)[-1]
+        	process = subprocess.Popen(getdata_cmd,
+                                   shell=True,
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.STDOUT)
+        	out, err = process.communicate()
+        	return out, err, process.returncode
+
 	def copy_files(self,  machine, src_path, dest_path):
 		# Copy files from a path in this computer to a remote destination
         	remote_path = user+"@" + machine + ":/"+dest_path
@@ -65,13 +79,15 @@ class Component:
         	out, err = process.communicate()
         	return out, err, process.returncode
 
-    	def mount():
+    	def mount(workload_path):
 		# Copy BeeFS zip
 		copy_zip(machine())
 		# Unzip the files of BeeFS
 		execute("unzip /tmp/"+self.__zipped, machine())
 		# Remove the zip, already unzipped
 		execute("rm /tmp/"+self.__zipped, machine())
+
+		
 		# Copy the configuration file of component in remote machine that will run it
 		copy_files(machine(), self.conf, "tmp/"+self.__zipped+"/conf/"+name+".conf")
 		
@@ -79,6 +95,13 @@ class Component:
 			execute("mkdir "+conf["contributing_storage.directory"], machine())
 		else if name is "honeybee":
 			execute("mkdir "+conf["mount_directory"], machine())
+			# Copy workload zip
+			copy_workload(machine(), workload_path)
+			# Unzip the files of workload
+			workload = workload_path.split(sep)[-1]
+			execute("unzip /tmp/"+workload, machine())
+			# Remove the zip, already unzipped
+			execute("rm /tmp/"+workload, machine())
 		
 		
 	def unmount():
@@ -89,10 +112,10 @@ class Component:
 	def clear():
 		# Cleaning metadata of component to start a new test
 		if name is "queenbee":
-			execute("rm "+conf["metadata_directory"]+"/Queenbee.*", machine())
+			execute("rm "+conf["metadata_directory"]+sep+"Queenbee.*", machine())
 		if name is "honeycomb":
-			execute("rm "+conf["contributing_storage.directory"]+"/*", machine())
-			execute("rm "+conf["metadata_directory"]+"/Honeycomb.*", machine())
+			execute("rm "+conf["contributing_storage.directory"]+sep+"*", machine())
+			execute("rm "+conf["metadata_directory"]+sep+"Honeycomb.*", machine())
 		
 	
 	def start():
@@ -116,23 +139,6 @@ class Component:
 		# try to stop component and return whether it is running or not
 		execute("bash /tmp/"+self.__zipped+"/bin/beefs stop "+name, machine())
 		return componentisrunning()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 def openconf(file):
 
@@ -204,9 +210,33 @@ def generateheader(text):
 	return  '#'*((60-len(text+'  '))/2) +' '+ text+' ' + '#'*((60-len(text+'  '))/2) +'\n'
 
 
-def main():
+def main(samples_config, zipped_path):
 	
+	for sample_config in samples_config:
+		 samples, queenbee, queenbee_conf, honeycomb, honeycomb_conf, honeybee, honeybee_conf = sample_config.values()
+		 data_server = Component("honeycomb", honeycomb, honeycomb_conf, zipped_path)
+		 meta_server = Component("queenbee", queenbee, queenbee_conf, zipped_path)
+		 client = Component("honeybee", honeybee, honeybee_conf, zipped_path)
 
+		 for i in range(sample_config['samples']):
+			data_server.mount(sample_config['files_to_write'])
+			meta_server.mount(sample_config['files_to_write'])
+			client.mount(sample_config['files_to_write'])
+			data_server.clear()
+			meta_server.clear()
+			data_server.start()
+			meta_server.start()
+			client.start()
+			data_server.stop()
+			meta_server.stop()
+			client.stop()
+			data_server.unmount()
+			meta_server.unmount()
+			client.unmount()
+
+
+
+	"""
 	# this script must be in beefs directory where exists \conf  
 	honeybee = openconf('conf'+sep+'honeybee.conf')
 	honeycomb = openconf('conf'+sep+'honeycomb.conf')
@@ -238,6 +268,7 @@ def main():
 	body =  'Copying from '+source+' to '+dest +'\n' + 'Command executed: '+command + '\n' + 'elapsed: ' + str( endepoch - startepoch )  +'s\n' + '#'*60 + '\n'
 	log.write(body)
 	log.close()
+	"""
 
 
 if __name__ == "__main__":
@@ -249,11 +280,6 @@ if __name__ == "__main__":
 	config_file = sys.argv[1]
 	#FIXME
 	zipped_path, samples_config = opencomponentfile(config_file)
-	for sample_config in samples_config: # This things should be in main()
-		 samples, queenbee, queenbee_conf, honeycomb, honeycomb_conf, honeybee, honeybee_conf = sample_config.values()
-		 data_server = Component("honeycomb", honeycomb, honeycomb_conf, zipped_path)
-		 meta_server = Component("queenbee", queenbee, queenbee_conf, zipped_path)
-		 client = Component("honeybee", honeybee, honeybee_conf, zipped_path)
 	#FIXME
 	main(samples_config, zipped_path)
 
