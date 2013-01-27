@@ -39,6 +39,7 @@ class Component:
     		return out, err, process.returncode
 
 	def copy_zip(self,  machine):
+		# Copy the zip from the path given in test_config.conf
         	remote_path = user+"@" + machine + ":/tmp/"
         	getdata_cmd = " ".join(["scp", "-r",
         	                        zipped_path,
@@ -52,6 +53,7 @@ class Component:
         	return out, err, process.returncode
 
 	def copy_files(self,  machine, src_path, dest_path):
+		# Copy files from a path in this computer to a remote destination
         	remote_path = user+"@" + machine + ":/"+dest_path
         	getdata_cmd = " ".join(["scp", "-r",
         	                        src_path,
@@ -80,6 +82,9 @@ class Component:
 		
 		
 	def unmount():
+		# removing the directory that contains BeeFS main files
+		execute("rm -r /tmp/"+self.__zipped, machine())
+		clear()
 
 	def clear():
 		# Cleaning metadata of component to start a new test
@@ -97,7 +102,7 @@ class Component:
                                  	 " | grep -v grep", machine())
       		        return out #if it is running, out is not empty, so it's is true
 
-
+		# try to start component and return whether it is running or not
 		execute("bash /tmp/"+self.__zipped+"/bin/beefs start "+name, machine())
 		return componentisrunning()
 
@@ -108,7 +113,7 @@ class Component:
                                  	 " | grep -v grep", machine())
       		        return out #if it is running, out is not empty, so it's is true
 
-
+		# try to stop component and return whether it is running or not
 		execute("bash /tmp/"+self.__zipped+"/bin/beefs stop "+name, machine())
 		return componentisrunning()
 
@@ -246,9 +251,9 @@ if __name__ == "__main__":
 	zipped_path, samples_config = opencomponentfile(config_file)
 	for sample_config in samples_config: # This things should be in main()
 		 samples, queenbee, queenbee_conf, honeycomb, honeycomb_conf, honeybee, honeybee_conf = sample_config.values()
-		 DATA_SERVER = Component("honeycomb", honeycomb, honeycomb_conf, zipped_path)
-		 META_SERVER = Component("queenbee", queenbee, queenbee_conf, zipped_path)
-		 CLIENT = Component("honeybee", honeybee, honeybee_conf, zipped_path)
+		 data_server = Component("honeycomb", honeycomb, honeycomb_conf, zipped_path)
+		 meta_server = Component("queenbee", queenbee, queenbee_conf, zipped_path)
+		 client = Component("honeybee", honeybee, honeybee_conf, zipped_path)
 	#FIXME
 	main(samples_config, zipped_path)
 
