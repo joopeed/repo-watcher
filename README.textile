@@ -42,11 +42,11 @@ h2. BeeFS zip and workloads
 
 h3. zip the directory of BeeFS
 
-<pre>zip beefs-trunk/ beefs.zip</pre>
+<pre>zip -r beefs beefs-trunk/</pre>
 
 h3. zip workloads
 
-<pre>zip workload1/ workload1.zip</pre>
+<pre>zip workload1 workload1/</pre>
 
 
 h2. Running
