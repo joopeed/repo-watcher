@@ -15,7 +15,7 @@ class Component:
 	def __init__(self, name, machine, conf, zipped_path):
         	self.__name = name
 		self.__machine = machine
-		self.__conf = conf
+		self.__conf = openconf(conf)
 		self.__zipped_path = zipped_path 
 
 

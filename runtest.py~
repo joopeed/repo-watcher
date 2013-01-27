@@ -102,7 +102,7 @@ class Component:
                                  	 " | grep -v grep", machine())
       		        return out #if it is running, out is not empty, so it's is true
 
-
+		# try to start component and return whether it is running or not
 		execute("bash /tmp/"+self.__zipped+"/bin/beefs start "+name, machine())
 		return componentisrunning()
 
@@ -113,7 +113,7 @@ class Component:
                                  	 " | grep -v grep", machine())
       		        return out #if it is running, out is not empty, so it's is true
 
-
+		# try to stop component and return whether it is running or not
 		execute("bash /tmp/"+self.__zipped+"/bin/beefs stop "+name, machine())
 		return componentisrunning()
 
