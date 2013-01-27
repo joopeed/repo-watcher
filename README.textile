@@ -46,7 +46,7 @@ h3. zip the directory of BeeFS
 
 h3. zip workloads
 
-<pre>zip workload1 workload1/</pre>
+<pre>zip -r workload1 workload1/</pre>
 
 
 h2. Running
