@@ -146,7 +146,7 @@ class Component:
 	def start(self):
 		def componentisrunning(self):
         		out, err, rcod = self.execute("ps xau | grep " + 
-                              	   	self.name() + 
+                              	   	self.name().capitalize() + 
                                  	 " | grep -v grep", self.machine())
 			print out
       		        return out #if it is running, out is not empty, so it's is true
@@ -156,11 +156,13 @@ class Component:
 		self.execute("bash /tmp/superzz/bin/beefs start "+self.name(), self.machine())
 		if componentisrunning(self):
 			print self.name()+" is already running at "+self.machine()
+		else:
+			print self.name()+" was not started at "+self.machine()
 
 	def stop(self):
 		def componentisrunning(self):
         		out, err, rcod = self.execute("ps xau | grep " + 
-                              	   	self.name() + 
+                              	   	self.name().capitalize() + 
                                  	 " | grep -v grep", self.machine())
       		        return out #if it is running, out is not empty, so it's is true
 
