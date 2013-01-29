@@ -243,7 +243,7 @@ def generateheader(text):
 
 
 def main(samples_config, zipped_path):
-	
+	print len(samples_config)
 	for sample_config in samples_config:
 		 samples = sample_config['samples']
 		 queenbee = sample_config['queenbee']
