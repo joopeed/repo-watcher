@@ -5,30 +5,39 @@ import popen2, subprocess, socket, os, sys, re, platform, datetime, time
 
 
 so = platform.system()
-	if so == "Linux":
-		sep = '/'
-	else:
-		sep = '\\'
+if so == "Linux":
+	sep = '/'
+else:
+	sep = '\\'
 user = "joopeeds"
 
 class Component:
 	def __init__(self, name, machine, conf, zipped_path):
         	self.__name = name
 		self.__machine = machine
+		self.__confplace = conf
 		self.__conf = openconf(conf)
 		self.__zipped_path = zipped_path 
 
 
 	def name(self):
         	return self.__name
-
+	
 	def conf(self):
         	return self.__conf
+
+	def conf_place(self):
+		return self.__confplace
 
 	def machine(self):
         	return self.__machine
 
-	def execute(remote_command, machine_addr, delay=None):
+	def zipped(self):
+        	return self.__zipped_path.split(" ")[-1][:-2]
+	
+	
+
+	def execute(self, remote_command, machine_addr, delay=None):
     		process = subprocess.Popen(" ".join(["ssh",
 	                                 user +"@" + machine_addr,
                                          remote_command]),
@@ -38,13 +47,12 @@ class Component:
    		out, err = process.communicate()
     		return out, err, process.returncode
 
-	def copy_zip(self,  machine):
+	def copy_zip(self, machine, zipped_path):
 		# Copy the zip from the path given in test_config.conf
         	remote_path = user+"@" + machine + ":/tmp/"
         	getdata_cmd = " ".join(["scp", "-r",
         	                        zipped_path,
         	                        remote_path])
-		self.__zipped = self.__zipped_path.split(sep)[-1]
         	process = subprocess.Popen(getdata_cmd,
                                    shell=True,
                                    stdout=subprocess.PIPE,
@@ -79,66 +87,73 @@ class Component:
         	out, err = process.communicate()
         	return out, err, process.returncode
 
-    	def mount(workload_path):
+    	def mount(self, workload_path):
 		# Copy BeeFS zip
-		copy_zip(machine())
+		print "mounting beefs files on "+ self.machine()
+		self.copy_zip(self.machine(), self.zipped())
+		print "copying files "+self.zipped()
 		# Unzip the files of BeeFS
-		execute("unzip /tmp/"+self.__zipped, machine())
+		print "unzipping beefs zip: "+ "unzip /tmp/"+self.zipped()+" -d /tmp/superzz"
+		self.execute("unzip /tmp/"+self.zipped()+" -d /tmp/superzz", self.machine())
 		# Remove the zip, already unzipped
-		execute("rm /tmp/"+self.__zipped, machine())
+		#self.execute("rm /tmp/"+self.zipped(), self.machine())
 
-		
 		# Copy the configuration file of component in remote machine that will run it
-		copy_files(machine(), self.conf, "tmp/"+self.__zipped+"/conf/"+name+".conf")
+		print "Copying .conf files, probably: in "+"tmp/superzz/conf/"+self.name()+".conf"
+		self.copy_files(self.machine(), self.conf_place(), "tmp/"+self.zipped()+"/conf/"+self.name()+".conf")
 		
-		if name is "honeycomb":
-			execute("mkdir "+conf["contributing_storage.directory"], machine())
-		else if name is "honeybee":
-			execute("mkdir "+conf["mount_directory"], machine())
+		if self.name() is "honeycomb":
+			self.execute("mkdir "+self.conf()["contributing_storage.directory"], self.machine())
+		elif self.name() is "honeybee":
+			self.execute("mkdir "+self.conf()["mount_directory"], self.machine())
 			# Copy workload zip
-			copy_workload(machine(), workload_path)
-			# Unzip the files of workload
+			self.copy_workload( self.machine(), workload_path)
+			# Unzip the files of workload FIXME
 			workload = workload_path.split(sep)[-1]
-			execute("unzip /tmp/"+workload, machine())
+			print "unzipping workload: "+"unzip 	/tmp/"+workload+" -d /tmp/workloadzz"
+			self.execute("unzip /tmp/"+workload+" -d /tmp/workloadzz", self.machine())
 			# Remove the zip, already unzipped
-			execute("rm /tmp/"+workload, machine())
+			#self.execute("rm /tmp/"+workload, self.machine())
 		
 		
-	def unmount():
+	def unmount(self):
 		# removing the directory that contains BeeFS main files
-		execute("rm -r /tmp/"+self.__zipped, machine())
-		clear()
+		self.execute("rm -r /tmp/"+self.zipped(), self.machine())
+		self.clear()
 
-	def clear():
+	def clear(self):
 		# Cleaning metadata of component to start a new test
-		if name is "queenbee":
+		if self.name is "queenbee":
 			execute("rm "+conf["metadata_directory"]+sep+"Queenbee.*", machine())
-		if name is "honeycomb":
+		if self.name is "honeycomb":
 			execute("rm "+conf["contributing_storage.directory"]+sep+"*", machine())
 			execute("rm "+conf["metadata_directory"]+sep+"Honeycomb.*", machine())
 		
 	
-	def start():
+	def start(self):
 		def componentisrunning(self):
-        		out, err, rcod = execute("ps xau | grep " + 
-                              	   	name() + 
-                                 	 " | grep -v grep", machine())
+        		out, err, rcod = self.execute("ps xau | grep " + 
+                              	   	self.name() + 
+                                 	 " | grep -v grep", self.machine())
+			print out
       		        return out #if it is running, out is not empty, so it's is true
 
 		# try to start component and return whether it is running or not
-		execute("bash /tmp/"+self.__zipped+"/bin/beefs start "+name, machine())
-		return componentisrunning()
+		print "Now: "+"bash /tmp/superzz/bin/beefs start "+self.name()
+		self.execute("bash /tmp/superzz/bin/beefs start "+self.name(), self.machine())
+		print "started"
+		return componentisrunning(self)
 
-	def stop():
+	def stop(self):
 		def componentisrunning(self):
-        		out, err, rcod = execute("ps xau | grep " + 
-                              	   	name() + 
-                                 	 " | grep -v grep", machine())
+        		out, err, rcod = self.execute("ps xau | grep " + 
+                              	   	self.name() + 
+                                 	 " | grep -v grep", self.machine())
       		        return out #if it is running, out is not empty, so it's is true
 
 		# try to stop component and return whether it is running or not
-		execute("bash /tmp/"+self.__zipped+"/bin/beefs stop "+name, machine())
-		return componentisrunning()
+		self.execute("bash /tmp/"+self.zipped()+"/bin/beefs stop "+self.name(), self.machine())
+		return componentisrunning(self)
 
 def openconf(file):
 
@@ -157,8 +172,8 @@ def openconf(file):
  	   else:
   	      key = line[:idx.start()]
   	      val = line[idx.start()+1:]
-  	  val = val.replace ("\\#", "#")
-  	  return (key.strip(),val.strip())
+  	   val = val.replace("\\#", "#")
+  	   return (key.strip(),val.strip())
 
         config = {}
         new = open(file).read()
@@ -170,32 +185,42 @@ def openconf(file):
 def opencomponentconf(file):
 
 	def fn(line):
- 	   if line[0] == "#":
- 	       line = ""
- 	   else:
- 	       idx = re.search (r"[^\\]#", line)
- 	       if idx != None:
- 	           line = line[:idx.start()+1]
- 	   # Split non-comment into key and value.
- 	   idx = re.search (r"=", line)
- 	   if idx == None:
-  	      key = line
-  	      val = ""
- 	   else:
-  	      key = line[:idx.start()]
-  	      val = line[idx.start()+1:]
-  	  val = val.replace ("\\#", "#")
-  	  return (key.strip(),val.strip())
+   		  # Split line into non-comment and comment.
+		 line = " " + line
+   		 comment = ""
+  		 if line[0] == "#":
+  		      comment = line
+  		      line = ""
+  		 else:
+ 		      idx = re.search (r"[^\\]#", line)
+ 		      if idx != None:
+ 		           comment = line[idx.start()+1:]
+ 		           line = line[:idx.start()+1]
+
+ 		   # Split non-comment into key and value.
+
+   		 idx = re.search (r"=", line)
+   		 if idx == None:
+   		     key = line
+   		     val = ""
+  		 else:
+   		     key = line[:idx.start()]
+   		     val = line[idx.start()+1:]
+  		 val = val.replace ("\\#", "#")
+
+  		 return (key.strip(),val.strip(),comment.strip())
 
         config = []
         new = open(file).read().split("[========]")
 	zipped_path = new[0]
-	for uni in range(1,len(new)):
+	for i in range(len(new)):
 		config.append({})
+	for uni in range(1,len(new)):
         	for i in new[uni].split('\n'):
-              	  if fn(" "+i)[0]!='':
-                        config[uni][fn(" "+i)[0]] = fn(" "+i)[1]
-        return zipped_path, config # returns the zip path that was in header of .conf and a list of dicts containing info confs
+              	  if fn(i)[0]!='':
+                        config[uni][fn(i)[0]] = fn(i)[1]
+	print config
+        return zipped_path, config[1:] # returns the zip path that was in header of .conf and a list of dicts containing info confs
 
 def getsize(source):
 	folder_size = 0
@@ -213,26 +238,34 @@ def generateheader(text):
 def main(samples_config, zipped_path):
 	
 	for sample_config in samples_config:
-		 samples, queenbee, queenbee_conf, honeycomb, honeycomb_conf, honeybee, honeybee_conf = sample_config.values()
+		 samples = sample_config['samples']
+		 queenbee = sample_config['queenbee']
+		 queenbee_conf = sample_config['queenbee_conf']
+		 honeycomb = sample_config['honeycomb']
+		 honeycomb_conf = sample_config['honeycomb_conf']
+		 honeybee = sample_config['honeybee']
+		 honeybee_conf = sample_config['honeybee_conf']
+		 files_to_write = sample_config['files_to_write']
 		 data_server = Component("honeycomb", honeycomb, honeycomb_conf, zipped_path)
 		 meta_server = Component("queenbee", queenbee, queenbee_conf, zipped_path)
 		 client = Component("honeybee", honeybee, honeybee_conf, zipped_path)
 
-		 for i in range(sample_config['samples']):
+		 for i in range(int(sample_config['samples'])):
+			print sample_config['files_to_write']
 			data_server.mount(sample_config['files_to_write'])
 			meta_server.mount(sample_config['files_to_write'])
-			client.mount(sample_config['files_to_write'])
-			data_server.clear()
-			meta_server.clear()
+			#client.mount(sample_config['files_to_write'])
+			#data_server.clear()
+			#meta_server.clear()
 			data_server.start()
 			meta_server.start()
 			client.start()
-			data_server.stop()
-			meta_server.stop()
-			client.stop()
-			data_server.unmount()
-			meta_server.unmount()
-			client.unmount()
+			#data_server.stop()
+			#meta_server.stop()
+			#client.stop()
+			#data_server.unmount()
+			#meta_server.unmount()
+			#client.unmount()
 
 
 
@@ -273,13 +306,14 @@ def main(samples_config, zipped_path):
 
 if __name__ == "__main__":
 
-	if len(sys.argv) != 1:
+	if len(sys.argv) != 2:
+	   
        	   sys.stderr.write("Usage: python beefstester.py config_file\n")
            sys.exit(-1)
 
 	config_file = sys.argv[1]
 	#FIXME
-	zipped_path, samples_config = opencomponentfile(config_file)
+	zipped_path, samples_config = opencomponentconf(config_file)
 	#FIXME
 	main(samples_config, zipped_path)
 
