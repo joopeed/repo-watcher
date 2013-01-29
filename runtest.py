@@ -148,16 +148,15 @@ class Component:
         		out, err, rcod = self.execute("ps xau | grep " + 
                               	   	self.name().capitalize() + 
                                  	 " | grep -v grep", self.machine())
-			print out
       		        return out #if it is running, out is not empty, so it's is true
 
 		# try to start component and return whether it is running or not
 		print "Starting "+self.name()+" and waiting confirmation"
 		self.execute("bash /tmp/superzz/bin/beefs start "+self.name(), self.machine())
 		if componentisrunning(self):
-			print self.name()+" is already running at "+self.machine()
+			print self.name()+" is already running on "+self.machine()
 		else:
-			print self.name()+" was NOT started at "+self.machine()
+			print self.name()+" was NOT started on "+self.machine()
 
 	def stop(self):
 		def componentisrunning(self):
