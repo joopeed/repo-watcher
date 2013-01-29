@@ -258,7 +258,7 @@ def main(samples_config, zipped_path):
 		 	meta_server = Component("queenbee", queenbee, queenbee_conf, zipped_path)
 		 	client = Component("honeybee", honeybee, honeybee_conf, zipped_path)
 
-			 for i in range(int(sample_config['samples'])):
+			for i in range(int(sample_config['samples'])):
 				print sample_config['files_to_write']
 				data_server.mount(sample_config['files_to_write'])
 				meta_server.mount(sample_config['files_to_write'])
