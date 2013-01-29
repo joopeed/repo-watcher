@@ -88,15 +88,22 @@ class Component:
         	return out, err, process.returncode
 
     	def mount(self, workload_path):
+
+
+		self.execute("rm -r /tmp/superzz", self.machine())
+		self.execute("rm -r /tmp/"+self.zipped(), self.machine())
+		self.execute("rm -r /tmp/workloadzz", self.machine())
+		self.execute("rm -r /tmp/"+workload_path.split(sep)[-1], self.machine())
 		# Copy BeeFS zip
 		print "mounting beefs files on "+ self.machine()
 		self.copy_zip(self.machine(), self.zipped())
-		print "copying files "+self.zipped()
+		print "copying "+self.zipped()
 		# Unzip the files of BeeFS
 		print "unzipping beefs zip: "+ "unzip /tmp/"+self.zipped()+" -d /tmp/superzz"
 		self.execute("unzip /tmp/"+self.zipped()+" -d /tmp/superzz", self.machine())
 		# Remove the zip, already unzipped
-		#self.execute("rm /tmp/"+self.zipped(), self.machine())
+		print "Removing zip..."
+		self.execute("rm /tmp/"+self.zipped(), self.machine())
 
 		# Copy the configuration file of component in remote machine that will run it
 		print "Copying .conf files, probably: in "+"tmp/superzz/conf/"+self.name()+".conf"
@@ -110,7 +117,7 @@ class Component:
 			self.copy_workload( self.machine(), workload_path)
 			# Unzip the files of workload FIXME
 			workload = workload_path.split(sep)[-1]
-			print "unzipping workload: "+"unzip 	/tmp/"+workload+" -d /tmp/workloadzz"
+			print "unzipping workload: "+"unzip /tmp/"+workload+" -d /tmp/workloadzz"
 			self.execute("unzip /tmp/"+workload+" -d /tmp/workloadzz", self.machine())
 			# Remove the zip, already unzipped
 			#self.execute("rm /tmp/"+workload, self.machine())
