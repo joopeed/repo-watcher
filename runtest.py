@@ -141,7 +141,11 @@ class Component:
 			print "Cleaning the storage and removing honeycomb metadata files..."
 			execute("rm "+conf["contributing_storage.directory"]+sep+"*", machine())
 			execute("rm "+conf["metadata_directory"]+sep+"Honeycomb.*", machine())
-		
+		print "Cleaning previous files..."
+		self.execute("rm -r /tmp/superzz", self.machine())
+		self.execute("rm -r /tmp/"+self.zipped(), self.machine())
+		self.execute("rm -r /tmp/workloadzz", self.machine())
+		self.execute("rm -r /tmp/"+workload_path.split(sep)[-1], self.machine())
 	
 	def start(self):
 		def componentisrunning(self):
