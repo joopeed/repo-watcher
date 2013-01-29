@@ -243,36 +243,37 @@ def generateheader(text):
 
 
 def main(samples_config, zipped_path):
-	
+	print len(samples_config)
 	for sample_config in samples_config:
-		 samples = sample_config['samples']
-		 queenbee = sample_config['queenbee']
-		 queenbee_conf = sample_config['queenbee_conf']
-		 honeycomb = sample_config['honeycomb']
-		 honeycomb_conf = sample_config['honeycomb_conf']
-		 honeybee = sample_config['honeybee']
-		 honeybee_conf = sample_config['honeybee_conf']
-		 files_to_write = sample_config['files_to_write']
-		 data_server = Component("honeycomb", honeycomb, honeycomb_conf, zipped_path)
-		 meta_server = Component("queenbee", queenbee, queenbee_conf, zipped_path)
-		 client = Component("honeybee", honeybee, honeybee_conf, zipped_path)
+		 if sample_config != {}:
+		 	samples = sample_config['samples']
+		 	queenbee = sample_config['queenbee']
+		 	queenbee_conf = sample_config['queenbee_conf']
+		 	honeycomb = sample_config['honeycomb']
+		 	honeycomb_conf = sample_config['honeycomb_conf']
+		 	honeybee = sample_config['honeybee']
+		 	honeybee_conf = sample_config['honeybee_conf']
+		 	files_to_write = sample_config['files_to_write']
+		 	data_server = Component("honeycomb", honeycomb, honeycomb_conf, zipped_path)
+		 	meta_server = Component("queenbee", queenbee, queenbee_conf, zipped_path)
+		 	client = Component("honeybee", honeybee, honeybee_conf, zipped_path)
 
-		 for i in range(int(sample_config['samples'])):
-			print sample_config['files_to_write']
-			data_server.mount(sample_config['files_to_write'])
-			meta_server.mount(sample_config['files_to_write'])
-			#client.mount(sample_config['files_to_write'])
-			#data_server.clear()
-			#meta_server.clear()
-			data_server.start()
-			meta_server.start()
-			client.start()
-			#data_server.stop()
-			#meta_server.stop()
-			#client.stop()
-			#data_server.unmount()
-			#meta_server.unmount()
-			#client.unmount()
+			 for i in range(int(sample_config['samples'])):
+				print sample_config['files_to_write']
+				data_server.mount(sample_config['files_to_write'])
+				meta_server.mount(sample_config['files_to_write'])
+				#client.mount(sample_config['files_to_write'])
+				#data_server.clear()
+				#meta_server.clear()
+				data_server.start()
+				meta_server.start()
+				client.start()
+				#data_server.stop()
+				#meta_server.stop()
+				#client.stop()
+				#data_server.unmount()
+				#meta_server.unmount()
+				#client.unmount()
 
 
 
