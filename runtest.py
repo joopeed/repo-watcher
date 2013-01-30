@@ -145,7 +145,7 @@ class Component:
 		self.execute("rm -r /tmp/superzz", self.machine())
 		self.execute("rm -r /tmp/"+self.zipped(), self.machine())
 		self.execute("rm -r /tmp/workloadzz", self.machine())
-		self.execute("rm -r /tmp/"+workload_path.split(sep)[-1], self.machine())
+		self.execute("rm -r /tmp/workload.zip", self.machine())
 	
 	def start(self):
 		def componentisrunning(self):
