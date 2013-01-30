@@ -106,7 +106,7 @@ class Component:
 
 		# Copy the configuration file of component in remote machine that will run it
 		print "Copying "+self.name()+".conf files into: tmp/superzz/conf/"+self.name()+".conf"
-		self.copy_files(self.machine(), self.conf_place(), "tmp/"+self.zipped()+"/conf/"+self.name()+".conf")
+		self.copy_files(self.machine(), self.conf_place(), "tmp/superzz/conf/"+self.name()+".conf")
 		
 		if self.name() is "honeycomb":
 			print "Making directories needed to run BeeFS..."
@@ -276,8 +276,8 @@ def main(samples_config, zipped_path):
 				data_server.mount(sample_config['files_to_write'])
 				meta_server.mount(sample_config['files_to_write'])
 				client.mount(sample_config['files_to_write'])
-				data_server.clear()
-				meta_server.clear()
+				#data_server.clear()
+				#meta_server.clear()
 				data_server.start()
 				meta_server.start()
 				client.start()
