@@ -2,7 +2,7 @@
 # coding: utf-8
 
 import popen2, subprocess, socket, os, sys, re, platform, datetime, time
-
+from time import sleep
 
 so = platform.system()
 if so == "Linux":
@@ -106,7 +106,7 @@ class Component:
 
 		# Copy the configuration file of component in remote machine that will run it
 		print "Copying "+self.name()+".conf files into: tmp/superzz/conf/"+self.name()+".conf"
-		self.copy_files(self.machine(), self.conf_place(), "tmpsuperzz/conf/"+self.name()+".conf")
+		self.copy_files(self.machine(), self.conf_place(), "tmp/superzz/conf/"+self.name()+".conf")
 		
 		if self.name() is "honeycomb":
 			print "Making directories needed to run BeeFS..."
@@ -152,7 +152,13 @@ class Component:
         		out, err, rcod = self.execute("ps xau | grep " + 
                               	   	self.name().capitalize() + 
                                  	 " | grep -v grep", self.machine())
-      		        return out #if it is running, out is not empty, so it's is true
+			print out.split()
+      		        if out.split()!=[]:
+				if out.split()[0]:
+      		        		return out #if it is running, out is not empty, so it's is true
+				else:
+					return ""
+			else: return ""
 
 		# try to start component and return whether it is running or not
 		print "Starting "+self.name()+" and waiting confirmation"
@@ -164,15 +170,22 @@ class Component:
 
 	def stop(self):
 		def componentisrunning(self):
+			sleep(5)
         		out, err, rcod = self.execute("ps xau | grep " + 
                               	   	self.name().capitalize() + 
                                  	 " | grep -v grep", self.machine())
-      		        return out #if it is running, out is not empty, so it's is true
+			if out.split()!=[]:
+				if out.split()[0]:
+      		        		return out #if it is running, out is not empty, so it's is true
+				else:
+					return ""
+			else: return ""
 
 		# try to stop component and return whether it is running or not
-		self.execute("bash /tmp/"+self.zipped()+"/bin/beefs stop "+self.name(), self.machine())
+		self.execute("bash /tmp/superzz/bin/beefs stop "+self.name(), self.machine())
 		if not componentisrunning(self):
-			print self.name()+" is not running anymore. Stopped"
+			print "Ok, "+self.name()+" is not running anymore. Stopped"
+		else:	print self.name()+" was not stopped!"
 
 
 def openconf(file):
@@ -281,12 +294,13 @@ def main(samples_config, zipped_path):
 				data_server.start()
 				meta_server.start()
 				client.start()
-				#data_server.stop()
-				#meta_server.stop()
-				#client.stop()
-				#data_server.unmount()
-				#meta_server.unmount()
-				#client.unmount()
+				client.stop()
+				data_server.stop()
+				meta_server.stop()
+				
+				data_server.unmount()
+				meta_server.unmount()
+				client.unmount()
 
 
 

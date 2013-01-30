@@ -9,13 +9,13 @@ honeycomb_conf = honeycomb.conf
 honeybee = abelhinha
 honeybee_conf = honeybee.conf
 files_to_write = workload.zip
-[========]
-samples = 4
-queenbee = ourico
-queenbee_conf = queenbee2.conf
-honeycomb = abelhinha
-honeycomb_conf = honeycomb2.conf
-honeybee = abelhinha
-honeybee_conf = honeybee2.conf
-files_to_write = workload.zip
+#[========]
+#samples = 4
+#queenbee = ourico
+#queenbee_conf = queenbee2.conf
+#honeycomb = abelhinha
+#honeycomb_conf = honeycomb2.conf
+#honeybee = abelhinha
+#honeybee_conf = honeybee2.conf
+#files_to_write = workload.zip
 
