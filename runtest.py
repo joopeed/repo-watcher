@@ -98,50 +98,50 @@ class Component:
         	return out, err, process.returncode
 
     	def mount(self, workload_path):
-
-		print "Cleaning previous files..."
+		
+		print datetime.datetime.now().strftime("[%d/%m/%Y %H:%M]-> ")+"Cleaning previous files..."
 		self.execute("rm -r /tmp/superzz", self.machine())
 		self.execute("rm -r /tmp/"+self.zipped(), self.machine())
 		self.execute("rm -r /tmp/workloadzz", self.machine())
 		self.execute("rm -r /tmp/"+workload_path.split(sep)[-1], self.machine())
 		# Copy BeeFS zip
-		print "Copying BeeFS ZIP ("+self.zipped()+") on "+ self.machine()
+		print datetime.datetime.now().strftime("[%d/%m/%Y %H:%M]-> ")+"Copying BeeFS ZIP ("+self.zipped()+") on "+ self.machine()
 		self.copy_zip(self.machine(), self.zipped())
 		# 	print self.execute("ls /tmp/", self.machine())
 		# Unzip the files of BeeFS
-		print "Unzipping BeeFS ZIP: /tmp/superzz"
+		print datetime.datetime.now().strftime("[%d/%m/%Y %H:%M]-> ")+"Unzipping BeeFS ZIP: /tmp/superzz"
 		self.execute("unzip /tmp/"+self.zipped()+" -d /tmp/superzz", self.machine())
 		# Remove the zip, already unzipped
-		print "Removing Zip..."
+		print datetime.datetime.now().strftime("[%d/%m/%Y %H:%M]-> ")+"Removing Zip..."
 		self.execute("rm /tmp/"+self.zipped(), self.machine())
 		if self.name() != "combee":
 			# Copy the configuration file of component in remote machine that will run it
-			print "Copying "+self.name()+".conf files into: tmp/superzz/conf/"+self.name()+".conf"
+			print datetime.datetime.now().strftime("[%d/%m/%Y %H:%M]-> ")+"Copying "+self.name()+".conf files into: tmp/superzz/conf/"+self.name()+".conf"
 			self.copy_files(self.machine(), self.conf_place(), "tmp/superzz/conf/"+self.name()+".conf")
 		else:
 			# Copy the configuration file of component in remote machine that will run it
-			print "Copying honeycomb.conf files into: tmp/superzz/conf/honeycomb.conf"
+			print datetime.datetime.now().strftime("[%d/%m/%Y %H:%M]-> ")+"Copying honeycomb.conf files into: tmp/superzz/conf/honeycomb.conf"
 			self.copy_files(self.machine(), self.conf_place(), "tmp/superzz/conf/honeycomb.conf")
 			# Copy the configuration file of component in remote machine that will run it
-			print "Copying honeybee.conf files into: tmp/superzz/conf/honeybee.conf"
+			print datetime.datetime.now().strftime("[%d/%m/%Y %H:%M]-> ")+"Copying honeybee.conf files into: tmp/superzz/conf/honeybee.conf"
 			self.copy_files(self.machine(), self.conf2_place(), "tmp/superzz/conf/honeybee.conf")
 			
 		
 		if self.name() is "honeycomb" or self.name() is "combee":
-			print "Making directories needed to run BeeFS..."
+			print datetime.datetime.now().strftime("[%d/%m/%Y %H:%M]-> ")+"Making directories needed to run BeeFS..."
 			self.execute("mkdir "+self.conf()["contributing_storage.directory"], self.machine())
 		if self.name() is "honeybee" or self.name() is "combee":
-			print "Making directories needed to run BeeFS..."
+			print datetime.datetime.now().strftime("[%d/%m/%Y %H:%M]-> ")+"Making directories needed to run BeeFS..."
 			if self.name() is "combee":
 				self.execute("mkdir "+self.conf2()["mount_directory"], self.machine())
 			else:
 				self.execute("mkdir "+self.conf()["mount_directory"], self.machine())
 			# Copy workload zip
-			print "Copying workload.zip into /tmp"
+			print datetime.datetime.now().strftime("[%d/%m/%Y %H:%M]-> ")+"Copying workload.zip into /tmp"
 			self.copy_workload( self.machine(), workload_path)
 			# Unzip the files of workload 
 			workload = workload_path.split(sep)[-1]
-			print "Unzipping workload: /tmp/workloadzz"
+			print datetime.datetime.now().strftime("[%d/%m/%Y %H:%M]-> ")+"Unzipping workload: /tmp/workloadzz"
 			self.execute("unzip /tmp/"+workload+" -d /tmp/workloadzz", self.machine())
 			# Remove the zip, already unzipped
 			self.execute("rm /tmp/"+workload, self.machine())
@@ -149,7 +149,7 @@ class Component:
 		
 	def unmount(self):
 		# removing the directory that contains BeeFS main files
-		print "Removing the BeeFS main directory..."
+		print datetime.datetime.now().strftime("[%d/%m/%Y %H:%M]-> ")+"Removing the BeeFS main directory..."
 		self.execute("rm -r /tmp/superzz", self.machine())
 		self.execute("rm -r /tmp/workloadzz", self.machine())
 		self.clear()
@@ -163,21 +163,21 @@ class Component:
                               	   	self.name().capitalize() + 
                                  	 " | grep "+user+"| grep -v grep", self.machine())
       		        if out.split()!=[]:
-				print "There is another instance of "+self.name()+" running on "+self.machine()
-				print "Killing now... Process "+out.split()[1]
+				print datetime.datetime.now().strftime("[%d/%m/%Y %H:%M]-> ")+"There is another instance of "+self.name()+" running on "+self.machine()
+				print datetime.datetime.now().strftime("[%d/%m/%Y %H:%M]-> ")+"Killing now... Process "+out.split()[1]
 				self.execute("kill "+out.split()[1], self.machine())
 
 
 	def clear(self):
 		# Cleaning metadata of component to start a new test
 		if self.name() is "queenbee":
-			print "Removing Queenbee.d and others metadata files..."
+			print datetime.datetime.now().strftime("[%d/%m/%Y %H:%M]-> ")+"Removing Queenbee.d and others metadata files..."
 			self.execute("rm "+self.conf()["metadata_directory"]+sep+"Queenbee.*", self.machine())
 		if self.name() is "honeycomb" or self.name() is "combee":
-			print "Cleaning the storage and removing honeycomb metadata files..."
+			print datetime.datetime.now().strftime("[%d/%m/%Y %H:%M]-> ")+"Cleaning the storage and removing honeycomb metadata files..."
 			self.execute("rm "+self.conf()["contributing_storage.directory"]+sep+"*", self.machine())
 			self.execute("rm "+self.conf()["metadata_directory"]+sep+"Honeycomb.*", self.machine())
-		print "Cleaning previous files..."
+		print datetime.datetime.now().strftime("[%d/%m/%Y %H:%M]-> ")+"Cleaning previous files..."
 		self.execute("rm -r /tmp/superzz", self.machine())
 		self.execute("rm -r /tmp/super.zip", self.machine())
 		self.execute("rm -r /tmp/workloadzz", self.machine())
@@ -192,12 +192,12 @@ class Component:
       		        return out #if it is running, out is not empty, so it's is true
 
 		# try to start component and return whether it is running or not
-		print "Starting "+self.name()+" and waiting confirmation"
+		print datetime.datetime.now().strftime("[%d/%m/%Y %H:%M]-> ")+"Starting "+self.name()+" and waiting confirmation"
 		self.execute("bash /tmp/superzz/bin/beefs start "+self.name(), self.machine())
 		if componentisrunning(self):
-			print self.name()+" is already running on "+self.machine()
+			print datetime.datetime.now().strftime("[%d/%m/%Y %H:%M]-> ")+self.name()+" is already running on "+self.machine()
 		else:
-			print self.name()+" was NOT started on "+self.machine()
+			print datetime.datetime.now().strftime("[%d/%m/%Y %H:%M]-> ")+self.name()+" was NOT started on "+self.machine()
 
 	def stop(self):
 		def componentisrunning(self):
@@ -207,11 +207,11 @@ class Component:
                                  	 " | grep "+user+"| grep -v grep", self.machine())
 			return out
 		# try to stop component and return whether it is running or not
-		print "Stopping "+self.name()+" and waiting confirmation"
+		print datetime.datetime.now().strftime("[%d/%m/%Y %H:%M]-> ")+"Stopping "+self.name()+" and waiting confirmation"
 		self.execute("bash /tmp/superzz/bin/beefs stop "+self.name(), self.machine())
 		if not componentisrunning(self):
-			print "Ok, "+self.name()+" is not running anymore. Stopped"
-		else:	print self.name()+" was not stopped!"
+			print datetime.datetime.now().strftime("[%d/%m/%Y %H:%M]-> ")+"Ok, "+self.name()+" is not running anymore. Stopped"
+		else:	print datetime.datetime.now().strftime("[%d/%m/%Y %H:%M]-> ")+self.name()+" was not stopped!"
 
 
 def openconf(file):
@@ -313,9 +313,6 @@ def main(samples_config, zipped_path):
 				meta_server.identify_SO()
 				data_server.identify_SO()
 				client.identify_SO()
-				print meta_server.so()
-				print data_server.so()
-				print client.so()
 				#FIXME
 				meta_server.clear()
 				data_server.clear()
