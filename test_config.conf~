@@ -2,12 +2,12 @@ zipped_path = super.zip
 
 [========]
 samples = 1
-queenbee = abelhinha
+queenbee = gupi
 queenbee_conf = queenbee.conf
-combee = mulato
-#honeycomb = mulato
+#combee = mulato
+honeycomb = mulato
 honeycomb_conf = honeycomb.conf
-#honeybee = mulato	
+honeybee = mulato	
 honeybee_conf = honeybee.conf
 files_to_write = workload.zip
 #[========]
@@ -19,4 +19,3 @@ files_to_write = workload.zip
 #honeybee = abelhinha
 #honeybee_conf = honeybee2.conf
 #files_to_write = workload.zip
-

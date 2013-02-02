@@ -37,6 +37,9 @@ class Component:
 
 	def conf2_place(self):
 		return self.__conf2place
+	
+	def so(self):
+        	return self.__so.strip("\n").strip("\r")
 
 	def machine(self):
         	return self.__machine
@@ -152,6 +155,10 @@ class Component:
 		self.execute("rm -r /tmp/superzz", self.machine())
 		self.execute("rm -r /tmp/workloadzz", self.machine())
 		self.clear()
+
+	def identify_SO(self): #this method must be *runned* before all others
+		#FIXME SCP the so.py
+		self.__so = self.execute("python teste.py", self.machine())[0]
 
 	def kill_others(self):
 			out, err, rcod = self.execute("ps xau | grep " + 
@@ -273,7 +280,6 @@ def opencomponentconf(file):
         	for i in new[uni].split('\n'):
               	  if fn(i)[0]!='':
                         config[uni][fn(i)[0]] = fn(i)[1]
-	print config
         return zipped_path, config[1:] # returns the zip path that was in header of .conf and a list of dicts containing info confs
 
 def getsize(source):
@@ -306,6 +312,10 @@ def main(samples_config, zipped_path):
 		 	 client = Component("honeybee", honeybee, honeybee_conf, "", zipped_path)
 			 for i in range(int(sample_config['samples'])):
 				#print sample_config['files_to_write']
+				meta_server.identify_SO()
+				data_server.identify_SO()
+				client.identify_SO()
+				#FIXME
 				meta_server.clear()
 				data_server.clear()
 				client.clear()
