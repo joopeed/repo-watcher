@@ -313,6 +313,9 @@ def main(samples_config, zipped_path):
 				meta_server.identify_SO()
 				data_server.identify_SO()
 				client.identify_SO()
+				print meta_server.so()
+				print data_server.so()
+				print client.so()
 				#FIXME
 				meta_server.clear()
 				data_server.clear()

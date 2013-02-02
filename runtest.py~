@@ -50,7 +50,7 @@ class Component:
 	
 
 	def execute(self, remote_command, machine_addr, delay=None):
-    		process = subprocess.Popen("ssh "+user +"@" + machine_addr+" "+remote_command),
+    		process = subprocess.Popen("ssh "+user +"@" + machine_addr+" "+remote_command,
 					 shell=True,
                                          stdout=subprocess.PIPE,
                                          stderr=subprocess.STDOUT)
@@ -313,6 +313,7 @@ def main(samples_config, zipped_path):
 				meta_server.identify_SO()
 				data_server.identify_SO()
 				client.identify_SO()
+				#FIXME
 				meta_server.clear()
 				data_server.clear()
 				client.clear()
