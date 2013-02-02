@@ -38,9 +38,7 @@ class Component:
 	
 
 	def execute(self, remote_command, machine_addr, delay=None):
-    		process = subprocess.Popen(" ".join(["ssh",
-	                                 user +"@" + machine_addr,
-                                         remote_command]),
+    		process = subprocess.Popen("ssh "+user +"@" + machine_addr+" "+remote_command,
 					 shell=True,
                                          stdout=subprocess.PIPE,
                                          stderr=subprocess.STDOUT)
