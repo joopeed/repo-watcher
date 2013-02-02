@@ -156,7 +156,7 @@ class Component:
 
 	def identify_SO(self): #this method must be *runned* before all others
 		#FIXME SCP the so.py
-		self.__so = self.execute("python teste.py", self.machine())[0]
+		self.__so = self.execute("python -m platform", self.machine())[0].split("-")[0]
 
 	def kill_others(self):
 			out, err, rcod = self.execute("ps xau | grep " + 
