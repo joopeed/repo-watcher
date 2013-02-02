@@ -12,12 +12,15 @@ else:
 user = "joopeeds"
 
 class Component:
-	def __init__(self, name, machine, conf, zipped_path):
+	def __init__(self, name, machine, conf, conf2, zipped_path):
         	self.__name = name
 		self.__machine = machine
 		self.__confplace = conf
 		self.__conf = openconf(conf)
 		self.__zipped_path = zipped_path 
+		if conf2: 
+			self.__conf2 = openconf(conf2)
+			self.__conf2place = conf2			
 
 
 	def name(self):
@@ -28,6 +31,15 @@ class Component:
 
 	def conf_place(self):
 		return self.__confplace
+
+	def conf2(self):
+        	return self.__conf2
+
+	def conf2_place(self):
+		return self.__conf2place
+	
+	def so(self):
+        	return self.__so.strip("\n").strip("\r")
 
 	def machine(self):
         	return self.__machine
@@ -95,23 +107,35 @@ class Component:
 		# Copy BeeFS zip
 		print "Copying BeeFS ZIP ("+self.zipped()+") on "+ self.machine()
 		self.copy_zip(self.machine(), self.zipped())
+		# 	print self.execute("ls /tmp/", self.machine())
 		# Unzip the files of BeeFS
 		print "Unzipping BeeFS ZIP: /tmp/superzz"
 		self.execute("unzip /tmp/"+self.zipped()+" -d /tmp/superzz", self.machine())
 		# Remove the zip, already unzipped
 		print "Removing Zip..."
 		self.execute("rm /tmp/"+self.zipped(), self.machine())
-
-		# Copy the configuration file of component in remote machine that will run it
-		print "Copying "+self.name()+".conf files into: tmp/superzz/conf/"+self.name()+".conf"
-		self.copy_files(self.machine(), self.conf_place(), "tmp/superzz/conf/"+self.name()+".conf")
+		if self.name() != "combee":
+			# Copy the configuration file of component in remote machine that will run it
+			print "Copying "+self.name()+".conf files into: tmp/superzz/conf/"+self.name()+".conf"
+			self.copy_files(self.machine(), self.conf_place(), "tmp/superzz/conf/"+self.name()+".conf")
+		else:
+			# Copy the configuration file of component in remote machine that will run it
+			print "Copying honeycomb.conf files into: tmp/superzz/conf/honeycomb.conf"
+			self.copy_files(self.machine(), self.conf_place(), "tmp/superzz/conf/honeycomb.conf")
+			# Copy the configuration file of component in remote machine that will run it
+			print "Copying honeybee.conf files into: tmp/superzz/conf/honeybee.conf"
+			self.copy_files(self.machine(), self.conf2_place(), "tmp/superzz/conf/honeybee.conf")
+			
 		
-		if self.name() is "honeycomb":
+		if self.name() is "honeycomb" or self.name() is "combee":
 			print "Making directories needed to run BeeFS..."
 			self.execute("mkdir "+self.conf()["contributing_storage.directory"], self.machine())
-		elif self.name() is "honeybee":
+		if self.name() is "honeybee" or self.name() is "combee":
 			print "Making directories needed to run BeeFS..."
-			self.execute("mkdir "+self.conf()["mount_directory"], self.machine())
+			if self.name() is "combee":
+				self.execute("mkdir "+self.conf2()["mount_directory"], self.machine())
+			else:
+				self.execute("mkdir "+self.conf()["mount_directory"], self.machine())
 			# Copy workload zip
 			print "Copying workload.zip into /tmp"
 			self.copy_workload( self.machine(), workload_path)
@@ -130,33 +154,42 @@ class Component:
 		self.execute("rm -r /tmp/workloadzz", self.machine())
 		self.clear()
 
+	def identify_SO(self): #this method must be *runned* before all others
+		#FIXME SCP the so.py
+		self.__so = self.execute("python teste.py", self.machine())[0]
+
+	def kill_others(self):
+			out, err, rcod = self.execute("ps xau | grep " + 
+                              	   	self.name().capitalize() + 
+                                 	 " | grep "+user+"| grep -v grep", self.machine())
+      		        if out.split()!=[]:
+				print "There is another instance of "+self.name()+" running on "+self.machine()
+				print "Killing now... Process "+out.split()[1]
+				self.execute("kill "+out.split()[1], self.machine())
+
+
 	def clear(self):
 		# Cleaning metadata of component to start a new test
-		if self.name is "queenbee":
+		if self.name() is "queenbee":
 			print "Removing Queenbee.d and others metadata files..."
-			execute("rm "+conf["metadata_directory"]+sep+"Queenbee.*", machine())
-		if self.name is "honeycomb":
+			self.execute("rm "+self.conf()["metadata_directory"]+sep+"Queenbee.*", self.machine())
+		if self.name() is "honeycomb" or self.name() is "combee":
 			print "Cleaning the storage and removing honeycomb metadata files..."
-			execute("rm "+conf["contributing_storage.directory"]+sep+"*", machine())
-			execute("rm "+conf["metadata_directory"]+sep+"Honeycomb.*", machine())
+			self.execute("rm "+self.conf()["contributing_storage.directory"]+sep+"*", self.machine())
+			self.execute("rm "+self.conf()["metadata_directory"]+sep+"Honeycomb.*", self.machine())
 		print "Cleaning previous files..."
 		self.execute("rm -r /tmp/superzz", self.machine())
-		self.execute("rm -r /tmp/"+self.zipped(), self.machine())
+		self.execute("rm -r /tmp/super.zip", self.machine())
 		self.execute("rm -r /tmp/workloadzz", self.machine())
 		self.execute("rm -r /tmp/workload.zip", self.machine())
 	
 	def start(self):
 		def componentisrunning(self):
+			sleep(5)
         		out, err, rcod = self.execute("ps xau | grep " + 
                               	   	self.name().capitalize() + 
-                                 	 " | grep -v grep", self.machine())
-			print out.split()
-      		        if out.split()!=[]:
-				if out.split()[0]:
-      		        		return out #if it is running, out is not empty, so it's is true
-				else:
-					return ""
-			else: return ""
+                                 	 " | grep "+user+"| grep -v grep", self.machine())
+      		        return out #if it is running, out is not empty, so it's is true
 
 		# try to start component and return whether it is running or not
 		print "Starting "+self.name()+" and waiting confirmation"
@@ -171,15 +204,10 @@ class Component:
 			sleep(5)
         		out, err, rcod = self.execute("ps xau | grep " + 
                               	   	self.name().capitalize() + 
-                                 	 " | grep -v grep", self.machine())
-			if out.split()!=[]:
-				if out.split()[0]:
-      		        		return out #if it is running, out is not empty, so it's is true
-				else:
-					return ""
-			else: return ""
-
+                                 	 " | grep "+user+"| grep -v grep", self.machine())
+			return out
 		# try to stop component and return whether it is running or not
+		print "Stopping "+self.name()+" and waiting confirmation"
 		self.execute("bash /tmp/superzz/bin/beefs stop "+self.name(), self.machine())
 		if not componentisrunning(self):
 			print "Ok, "+self.name()+" is not running anymore. Stopped"
@@ -250,7 +278,6 @@ def opencomponentconf(file):
         	for i in new[uni].split('\n'):
               	  if fn(i)[0]!='':
                         config[uni][fn(i)[0]] = fn(i)[1]
-	print config
         return zipped_path, config[1:] # returns the zip path that was in header of .conf and a list of dicts containing info confs
 
 def getsize(source):
@@ -267,38 +294,69 @@ def generateheader(text):
 
 
 def main(samples_config, zipped_path):
-	print len(samples_config)
 	for sample_config in samples_config:
 		 if sample_config != {}:
-		 	samples = sample_config['samples']
-		 	queenbee = sample_config['queenbee']
-		 	queenbee_conf = sample_config['queenbee_conf']
-		 	honeycomb = sample_config['honeycomb']
-		 	honeycomb_conf = sample_config['honeycomb_conf']
-		 	honeybee = sample_config['honeybee']
-		 	honeybee_conf = sample_config['honeybee_conf']
-		 	files_to_write = sample_config['files_to_write']
-		 	data_server = Component("honeycomb", honeycomb, honeycomb_conf, zipped_path)
-		 	meta_server = Component("queenbee", queenbee, queenbee_conf, zipped_path)
-		 	client = Component("honeybee", honeybee, honeybee_conf, zipped_path)
-
-			for i in range(int(sample_config['samples'])):
-				print sample_config['files_to_write']
-				data_server.mount(sample_config['files_to_write'])
+			if not sample_config.has_key("combee"):
+		 	 samples = sample_config['samples']
+		 	 queenbee = sample_config['queenbee']
+		 	 queenbee_conf = sample_config['queenbee_conf']
+		 	 honeycomb = sample_config['honeycomb']
+		 	 honeycomb_conf = sample_config['honeycomb_conf']
+		 	 honeybee = sample_config['honeybee']
+		 	 honeybee_conf = sample_config['honeybee_conf']
+		 	 files_to_write = sample_config['files_to_write']
+		 	 data_server = Component("honeycomb", honeycomb, honeycomb_conf, "", zipped_path)
+		 	 meta_server = Component("queenbee", queenbee, queenbee_conf, "", zipped_path)
+		 	 client = Component("honeybee", honeybee, honeybee_conf, "", zipped_path)
+			 for i in range(int(sample_config['samples'])):
+				#print sample_config['files_to_write']
+				meta_server.identify_SO()
+				data_server.identify_SO()
+				client.identify_SO()
+				meta_server.clear()
+				data_server.clear()
+				client.clear()
+				meta_server.kill_others()
+				data_server.kill_others()
+				client.kill_others()
 				meta_server.mount(sample_config['files_to_write'])
+				data_server.mount(sample_config['files_to_write'])
 				client.mount(sample_config['files_to_write'])
-				#data_server.clear()
-				#meta_server.clear()
-				data_server.start()
 				meta_server.start()
+				data_server.start()
 				client.start()
 				client.stop()
 				data_server.stop()
 				meta_server.stop()
-				
 				data_server.unmount()
 				meta_server.unmount()
 				client.unmount()
+			else:
+			 samples = sample_config['samples']
+		 	 queenbee = sample_config['queenbee']
+		 	 queenbee_conf = sample_config['queenbee_conf']
+		 	 combee = sample_config['combee']
+		 	 honeycomb_conf = sample_config['honeycomb_conf']
+		 	 honeybee_conf = sample_config['honeybee_conf']
+		 	 files_to_write = sample_config['files_to_write']
+		 	 combee = Component("combee", combee, honeycomb_conf, honeybee_conf, zipped_path)
+		 	 meta_server = Component("queenbee", queenbee, queenbee_conf, "", zipped_path)
+			 for i in range(int(sample_config['samples'])):
+				#print sample_config['files_to_write']
+				meta_server.clear()
+				combee.clear()
+				meta_server.kill_others()
+				combee.kill_others()	
+				meta_server.mount(sample_config['files_to_write'])
+				combee.mount(sample_config['files_to_write'])
+				meta_server.start()
+				combee.start()
+				combee.stop()
+				meta_server.stop()
+				meta_server.unmount()
+				combee.unmount()
+						
+			
 
 
 
