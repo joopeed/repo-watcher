@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # coding: utf-8
 
-import popen2, subprocess, socket, os, sys, re, platform, datetime, time
+import popen2, subprocess, socket, os, sys, re, platform, datetime, time, paramiko
 from time import sleep
 
 so = platform.system()
@@ -20,7 +20,8 @@ class Component:
 		self.__zipped_path = zipped_path 
 		if conf2: 
 			self.__conf2 = openconf(conf2)
-			self.__conf2place = conf2			
+			self.__conf2place = conf2
+		self.identify_SO()			
 
 
 	def name(self):
@@ -52,101 +53,207 @@ class Component:
 		return datetime.datetime.now().strftime("[%d/%m/%Y %H:%M:%S]-> ")
 
 	def execute(self, remote_command, machine_addr, delay=None):
-    		process = subprocess.Popen("ssh "+user +"@" + machine_addr+" "+remote_command,
+		if machine_addr is not None:
+			cmd = "ssh "+user +"@" + machine_addr+" "+remote_command
+		else:
+			cmd = remote_command
+    		process = subprocess.Popen(cmd,
 					 shell=True,
                                          stdout=subprocess.PIPE,
                                          stderr=subprocess.STDOUT)
    		out, err = process.communicate()
+		print out
     		return out, err, process.returncode
+	"""
+	def execute_on_windows(self, remote_command, machine_addr, delay=None):
+		cmd = "ssh "+user +"@" + machine_addr
+    		process = subprocess.Popen(cmd,
+					 #shell=True,
+                                         stdout=subprocess.PIPE,
+                                         stderr=subprocess.STDOUT,stdin=subprocess.PIPE)
+		sleep(1)
+		process.stdin.write(remote_command+"\n")
 
+	"""
+	def start_on_windows(self, remote_command, machine_addr, delay=None):
+		if machine_addr is not None:
+			cmd = "ssh "+user +"@" + machine_addr
+		else:
+			cmd = remote_command
+    		process = subprocess.Popen(cmd,
+					# shell=True,
+					stdout=subprocess.PIPE,
+                                         stderr=subprocess.STDOUT,stdin=subprocess.PIPE)
+		sleep(1)
+		process.stdin.write("cd beefs-tester/superzz/bin/\n")
+   		process.stdin.write("beefs.bat start "+self.name()+"\n")
+    		return out, err, process.returncode
+	
 	def copy_zip(self, machine, zipped_path):
 		# Copy the zip from the path given in test_config.conf
-        	remote_path = user+"@" + machine + ":/tmp/"
-        	getdata_cmd = " ".join(["scp", "-r",
-        	                        zipped_path,
+		if self.so()=='Linux':
+        		remote_path = user+"@" + machine + ":/tmp/"
+        		getdata_cmd = " ".join(["scp", "-r",
+        	                        zipped_path,	
         	                        remote_path])
-        	process = subprocess.Popen(getdata_cmd,
+			process = subprocess.Popen(getdata_cmd,
                                    shell=True,
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.STDOUT)
-        	out, err = process.communicate()
+        		out, err = process.communicate()
+		else:
+			self.execute("unzip -o "+zipped_path+" -d superzz", None)
+			self.execute("mkdir C:/beefs-tester/superzz/superzz", machine)
+			getdata_cmd = "sftp "+user+"@" + machine
+        		process = subprocess.Popen(getdata_cmd,
+                                  shell=True,
+				   stdout=subprocess.PIPE,
+                                         stderr=subprocess.STDOUT,stdin=subprocess.PIPE)
+			process.stdin.write("cd beefs-tester/superzz/\n")
+			process.stdin.write("put -r superzz/*\n")
+			process.stdin.write("quit\n")
+			print process.stdout.readline()
+			out, err = "","" #process.communicate()
         	return out, err, process.returncode
 
 	def copy_workload(self,  machine, workload_path):
 		# Copy the zip from the path given in test_config.conf
-        	remote_path = user+"@" + machine + ":/tmp/"
-        	getdata_cmd = " ".join(["scp", "-r",
+		if self.so()=='Linux':
+        		remote_path = user+"@" + machine + ":/tmp/"
+        		getdata_cmd = " ".join(["scp", "-r",
         	                        workload_path,
         	                        remote_path])
-		workload = workload_path.split(sep)[-1]
-        	process = subprocess.Popen(getdata_cmd,
+			process = subprocess.Popen(getdata_cmd,
                                    shell=True,
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.STDOUT)
-        	out, err = process.communicate()
+        		out, err = process.communicate()
+		else:
+			self.execute("unzip -o "+workload_path+" -d workloadzz", None)
+			self.execute("mkdir C:/beefs-tester/workloadzz/workloadzz", self.machine())
+			getdata_cmd = "sftp "+user+"@" + machine
+        		process = subprocess.Popen(getdata_cmd,
+                                  stdout=subprocess.PIPE,
+                                         stderr=subprocess.STDOUT,stdin=subprocess.PIPE)	
+			process.stdin.write("cd beefs-tester/workload/\n")
+			process.stdin.write("put -r workloadzz/*\n")
+			process.stdin.write("quit\n")
+			print process.stdout.readline()
+			out, err = "","" #process.communicate()
         	return out, err, process.returncode
 
 	def copy_files(self,  machine, src_path, dest_path):
 		# Copy files from a path in this computer to a remote destination
-        	remote_path = user+"@" + machine + ":/"+dest_path
-        	getdata_cmd = " ".join(["scp", "-r",
+		if self.so()=='Linux':
+        		remote_path = user+"@" + machine + ":/"+dest_path
+        		getdata_cmd = " ".join(["scp", "-r",
         	                        src_path,
         	                        remote_path])
-        	process = subprocess.Popen(getdata_cmd,
-                                   shell=True,
+			process = subprocess.Popen(getdata_cmd,
+                                  shell=True,
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.STDOUT)
-        	out, err = process.communicate()
+        		out, err = process.communicate()
+		else:
+			getdata_cmd = "sftp "+user +"@" + machine
+        		process = subprocess.Popen(getdata_cmd,		
+                                   stdout=subprocess.PIPE,
+                                         stderr=subprocess.STDOUT,stdin=subprocess.PIPE)
+			process.stdin.write("cd "+dest_path+"\n")
+			process.stdin.write("put -r "+src_path+"\n")
+			process.stdin.write("quit\n")
+			out, err = "",""#process.communicate()
         	return out, err, process.returncode
 
     	def mount(self, workload_path):
-		
-		print self._get_time()+"Cleaning previous files..."
-		self.execute("rm -r /tmp/superzz", self.machine())
-		self.execute("rm -r /tmp/"+self.zipped(), self.machine())
-		self.execute("rm -r /tmp/workloadzz", self.machine())
-		self.execute("rm -r /tmp/"+workload_path.split(sep)[-1], self.machine())
-		# Copy BeeFS zip
-		print self._get_time()+"Copying BeeFS ZIP ("+self.zipped()+") on "+ self.machine()
-		self.copy_zip(self.machine(), self.zipped())
-		# 	print self.execute("ls /tmp/", self.machine())
-		# Unzip the files of BeeFS
-		print self._get_time()+"Unzipping BeeFS ZIP: /tmp/superzz"
-		self.execute("unzip /tmp/"+self.zipped()+" -d /tmp/superzz", self.machine())
-		# Remove the zip, already unzipped
-		print self._get_time()+"Removing Zip..."
-		self.execute("rm /tmp/"+self.zipped(), self.machine())
-		if self.name() != "combee":
-			# Copy the configuration file of component in remote machine that will run it
-			print self._get_time()+"Copying "+self.name()+".conf files into: tmp/superzz/conf/"+self.name()+".conf"
-			self.copy_files(self.machine(), self.conf_place(), "tmp/superzz/conf/"+self.name()+".conf")
-		else:
-			# Copy the configuration file of component in remote machine that will run it
-			print self._get_time()+"Copying honeycomb.conf files into: tmp/superzz/conf/honeycomb.conf"
-			self.copy_files(self.machine(), self.conf_place(), "tmp/superzz/conf/honeycomb.conf")
-			# Copy the configuration file of component in remote machine that will run it
-			print self._get_time()+"Copying honeybee.conf files into: tmp/superzz/conf/honeybee.conf"
-			self.copy_files(self.machine(), self.conf2_place(), "tmp/superzz/conf/honeybee.conf")
+		if self.so()=="Linux":
+			print self.machine()
+			print self._get_time()+"Cleaning previous files..."
+			self.execute("rm -r /tmp/superzz", self.machine())
+			self.execute("rm -r /tmp/"+self.zipped(), self.machine())
+			self.execute("rm -r /tmp/workloadzz", self.machine())
+			self.execute("rm -r /tmp/"+workload_path.split(sep)[-1], self.machine())
+			# Copy BeeFS zip
+			print self._get_time()+"Copying BeeFS ZIP ("+self.zipped()+") on "+ self.machine()
+			self.copy_zip(self.machine(), self.zipped())
+			# 	print self.execute("ls /tmp/", self.machine())
+			# Unzip the files of BeeFS
+			print self._get_time()+"Unzipping BeeFS ZIP: /tmp/superzz"
+			self.execute("unzip /tmp/"+self.zipped()+" -d /tmp/superzz", self.machine())
+			# Remove the zip, already unzipped
+			print self._get_time()+"Removing Zip..."
+			self.execute("rm /tmp/"+self.zipped(), self.machine())
+			if self.name() != "combee":
+				# Copy the configuration file of component in remote machine that will run it
+				print self._get_time()+"Copying "+self.name()+".conf files into: tmp/superzz/conf/"+self.name()+".conf"
+				self.copy_files(self.machine(), self.conf_place(), "tmp/superzz/conf/"+self.name()+".conf")
+			else:
+				# Copy the configuration file of component in remote machine that will run it
+				print self._get_time()+"Copying honeycomb.conf files into: tmp/superzz/conf/honeycomb.conf"
+				self.copy_files(self.machine(), self.conf_place(), "tmp/superzz/conf/honeycomb.conf")
+				# Copy the configuration file of component in remote machine that will run it
+				print self._get_time()+"Copying honeybee.conf files into: tmp/superzz/conf/honeybee.conf"
+				self.copy_files(self.machine(), self.conf2_place(), "tmp/superzz/conf/honeybee.conf")
 			
 		
-		if self.name() is "honeycomb" or self.name() is "combee":
-			print self._get_time()+"Making directories needed to run BeeFS..."
-			self.execute("mkdir "+self.conf()["contributing_storage.directory"], self.machine())
-		if self.name() is "honeybee" or self.name() is "combee":
-			print self._get_time()+"Making directories needed to run BeeFS..."
-			if self.name() is "combee":
-				self.execute("mkdir "+self.conf2()["mount_directory"], self.machine())
+			if self.name() is "honeycomb" or self.name() is "combee":
+				print self._get_time()+"Making directories needed to run BeeFS..."
+				self.execute("mkdir "+self.conf()["contributing_storage.directory"], self.machine())
+			if self.name() is "honeybee" or self.name() is "combee":
+				print self._get_time()+"Making directories needed to run BeeFS..."
+				if self.name() is "combee":
+					self.execute("mkdir "+self.conf2()["mount_directory"], self.machine())
+				else:
+					self.execute("mkdir "+self.conf()["mount_directory"], self.machine())
+				# Copy workload zip
+				print self._get_time()+"Copying workload.zip into /tmp"
+				self.copy_workload( self.machine(), workload_path)
+				# Unzip the files of workload 
+				workload = workload_path.split(sep)[-1]
+				print self._get_time()+"Unzipping workload: /tmp/workloadzz"
+				self.execute("unzip /tmp/"+workload+" -d /tmp/workloadzz", self.machine())
+				# Remove the zip, already unzipped
+				self.execute("rm /tmp/"+workload, self.machine())
+		else:
+			
+			print self._get_time()+"Cleaning previous files..."
+			self.execute("rm -r C:/beefs-tester/superzz/*", self.machine())
+			self.execute("rm -r C:/beefs-tester/workloadzz/*", self.machine())
+			# Copy BeeFS zip
+			self.execute("mkdir C:/beefs-tester/", self.machine())
+			self.execute("mkdir C:/beefs-tester/superzz", self.machine())
+			self.execute("mkdir C:/beefs-tester/workloadzz", self.machine())
+			print self._get_time()+"Copying BeeFS ZIP ("+self.zipped()+") and extracting... on "+ self.machine()
+			self.copy_zip(self.machine(), self.zipped())
+			print self._get_time()+"Unzipping BeeFS ZIP: C:/beefs-tester/superzz"
+			if self.name() != "combee":
+				# Copy the configuration file of component in remote machine that will run it
+				print self._get_time()+"Copying "+self.name()+".conf files into: C:\\beefs-tester\\superzz\\conf\\"+self.name()+".conf"
+				self.copy_files(self.machine(), self.conf_place(), "C:\\beefs-tester\\superzz\\conf\\"+self.name()+".conf")
 			else:
-				self.execute("mkdir "+self.conf()["mount_directory"], self.machine())
-			# Copy workload zip
-			print self._get_time()+"Copying workload.zip into /tmp"
-			self.copy_workload( self.machine(), workload_path)
-			# Unzip the files of workload 
-			workload = workload_path.split(sep)[-1]
-			print self._get_time()+"Unzipping workload: /tmp/workloadzz"
-			self.execute("unzip /tmp/"+workload+" -d /tmp/workloadzz", self.machine())
-			# Remove the zip, already unzipped
-			self.execute("rm /tmp/"+workload, self.machine())
+				# Copy the configuration file of component in remote machine that will run it
+				print self._get_time()+"Copying honeycomb.conf files into: C:/beefs-tester/superzz/conf/\honeycomb.conf"
+				self.copy_files(self.machine(), self.conf_place(), "C:/beefs-tester/superzz/conf/honeycomb.conf")
+				# Copy the configuration file of component in remote machine that will run it
+				print self._get_time()+"Copying honeybee.conf files into: tmp/superzz/conf/honeybee.conf"
+				self.copy_files(self.machine(), self.conf2_place(), "C:\\beefs-tester\\superzz\\conf\\honeybee.conf")
+			
+		
+			
+		
+			if self.name() is "honeycomb" or self.name() is "combee":
+				print self._get_time()+"Making directories needed to run BeeFS..."
+				self.execute("mkdir "+self.conf()["contributing_storage.directory"], self.machine())
+			if self.name() is "honeybee" or self.name() is "combee":
+				print self._get_time()+"Making directories needed to run BeeFS..."
+				if self.name() is "combee":
+					self.execute_on_windows("mkdir "+self.conf2()["mount_directory"], self.machine())
+				else:
+					self.execute_on_windows("mkdir "+self.conf()["mount_directory"], self.machine())
+				# Copy workload zip
+				print self._get_time()+"Copying workload.zip into C:\\beefs-tester\\"
+				self.copy_workload( self.machine(), workload_path)
+
 		
 		
 	def unmount(self):
@@ -157,7 +264,6 @@ class Component:
 		self.clear()
 
 	def identify_SO(self): #this method must be *runned* before all others
-		#FIXME SCP the so.py
 		self.__so = self.execute("python -m platform", self.machine())[0].split("-")[0]
 
 	def kill_others(self):
@@ -195,7 +301,10 @@ class Component:
 
 		# try to start component and return whether it is running or not
 		print self._get_time()+"Starting "+self.name()+" and waiting confirmation"
-		self.execute("bash /tmp/superzz/bin/beefs start "+self.name(), self.machine())
+		if self.so()=="Linux":
+			self.execute("bash /tmp/superzz/bin/beefs start "+self.name(), self.machine())
+		else:
+			self.start_on_windows("cd C:\\beefs-tester\\superzz\\", self.machine())
 		if componentisrunning(self):
 			print self._get_time()+self.name()+" is already running on "+self.machine()
 		else:
@@ -328,12 +437,12 @@ def main(samples_config, zipped_path):
 				meta_server.start()
 				data_server.start()
 				client.start()
-				client.stop()
-				data_server.stop()
-				meta_server.stop()
-				data_server.unmount()
-				meta_server.unmount()
-				client.unmount()
+				#client.stop()
+				#data_server.stop()
+				#meta_server.stop()
+				#data_server.unmount()
+				#meta_server.unmount()
+				#client.unmount()
 			else:
 			 samples = sample_config['samples']
 		 	 queenbee = sample_config['queenbee']
