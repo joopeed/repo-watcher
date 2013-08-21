@@ -30,3 +30,6 @@ At the escalability folder you find scripts of escalability experiments executed
 These scripts also allows you analyze the behavior of BeeFS while writing the given workload,
 but differs from the other, because allows more than one "write" at the same time, this way you
 may analyze which configuration or quantity of writes the BeeFS can tolerate.
+
+I would like to thank Thiago Manel, these scripts are based on his work.
+

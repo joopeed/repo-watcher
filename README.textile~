@@ -24,4 +24,9 @@ This script allows you analyze the behavior of BeeFS while writing the given wor
 The results are printed into files with the configuration of each test case.
 You should attend that the BeeFS may be configured for several configurations modes.
 
+h2. Escalability
 
+At the escalability folder you find scripts of escalability experiments executed on BeeFS.
+These scripts also allows you analyze the behavior of BeeFS while writing the given workload,
+but differs from the other, because allows more than one "write" at the same time, this way you
+may analyze which configuration or quantity of writes the BeeFS can tolerate.
