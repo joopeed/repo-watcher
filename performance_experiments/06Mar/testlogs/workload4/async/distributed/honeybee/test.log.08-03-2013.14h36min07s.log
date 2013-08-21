@@ -1,0 +1,10 @@
+############################################################
+############  Test on Linux 08/03/2013 14:36:07 ############
+############## Hostname of honeycomb: mulato ##############
+################## Queenbee on abelhinha ##################
+########## Mode: async , distributed and honeybee ##########
+############### Workload: 378.0MB 7900 files ###############
+Copying from /tmp/workloadzz to /tmp/beefs-mount
+Command executed: cp -r /tmp/workloadzz/ /tmp/beefs-mount/workload/
+elapsed: 178s
+############################################################
