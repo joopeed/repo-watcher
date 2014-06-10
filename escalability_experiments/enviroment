@@ -1,0 +1,6 @@
+[General]
+beefs_zip_path=super.zip
+workload_zip_path=workload.zip
+workload_size=10mbUnico
+results_path=results/10mbUnico
+minutes_until_start_copying=3

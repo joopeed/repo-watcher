@@ -1,0 +1,35 @@
+h1. Beehive File System tester
+
+* @BeeFS@ or @Beehive File System@ [1] is a distributed file system for local area networks (LANs)
+that is both scalable and simple to maintain. It is being developed at Distributed Systems Laboratory (LSD)[2]
+at Federal University of Campina Grande[3], Brazil.
+
+* This tester will analyze the behavior of BeeFS into different situations
+(including changing the mode of file synchronization, workloads and so on),
+will allow execute performance tests more automatically and generate more results in less time
+
+
+
+
+fn1. "(classname)lsd.ufcg.edu.br/beefs(title tooltip)":http://www.lsd.ufcg.edu.br/beefs
+
+fn2. "(classname)ufcg.edu.br(title tooltip)":http://www.ufcg.edu.br
+
+fn3. "(classname)lsd.ufcg.edu.br(title tooltip)":http://www.lsd.ufcg.edu.br
+
+h2. Performance
+
+At the performance folder you find the scripts of performance experiments executed on BeeFS.
+This script allows you analyze the behavior of BeeFS while writing the given workload.
+The results are printed into files with the configuration of each test case.
+You should attend that the BeeFS may be configured for several configurations modes.
+
+h2. Escalability
+
+At the escalability folder you find scripts of escalability experiments executed on BeeFS.
+These scripts also allows you analyze the behavior of BeeFS while writing the given workload,
+but differs from the other, because allows more than one "write" at the same time, this way you
+may analyze which configuration or quantity of writes the BeeFS can tolerate.
+
+I would like to thank Thiago Manel, these scripts are based on his work.
+

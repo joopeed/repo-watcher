@@ -1,0 +1,6 @@
+[General]
+beefs_zip_path=super.zip
+workload_zip_path=workload.zip
+workload_size=378mb
+results_path=results/378mb
+minutes_until_start_collecting=3
