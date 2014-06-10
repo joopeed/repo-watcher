@@ -1,2 +1,0 @@
-grep getattr beefs.log | cut -d" " -f9 | cut -d"[" -f2 | cut -d"]" -f1 > /home/ubuntu/getattr_with_10.txt
-   63  grep write beefs.log | cut -d" " -f9 | cut -d"[" -f2 | cut -d"]" -f1 > /home/ubuntu/write_with_10.txt
