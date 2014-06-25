@@ -84,7 +84,7 @@ def clone(repository):
     """ Clones the given repository"""
     folder_name = extract_folder_name(repository)
     execute("mkdir " + folder_name)
-    out, err, rcod = execute("git clone " + repository + " " +  + folder_name )
+    out, err, rcod = execute("git clone " + repository + " " + folder_name )
     return out
 
 
