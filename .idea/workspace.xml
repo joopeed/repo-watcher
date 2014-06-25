@@ -38,7 +38,7 @@
       <file leaf-file-name="verify_library.py" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/verify_library.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="56" column="46" selection-start="1894" selection-end="1894" vertical-scroll-proportion="0.622449" vertical-offset="586" max-vertical-offset="2329">
+            <state line="45" column="18" selection-start="1351" selection-end="1351" vertical-scroll-proportion="0.30442178" vertical-offset="586" max-vertical-offset="2329">
               <folding />
             </state>
           </provider>
@@ -410,7 +410,11 @@
       <created>1403702758571</created>
       <updated>1403702758571</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Find src folder automatically">
+      <created>1403703384564</created>
+      <updated>1403703384564</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -475,7 +479,8 @@
     <MESSAGE value="Shrinking time between updates" />
     <MESSAGE value="More fixes" />
     <MESSAGE value="Running sonar for every first run" />
-    <option name="LAST_COMMIT_MESSAGE" value="Running sonar for every first run" />
+    <MESSAGE value="Find src folder automatically" />
+    <option name="LAST_COMMIT_MESSAGE" value="Find src folder automatically" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -522,7 +527,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/verify_library.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="56" column="46" selection-start="1894" selection-end="1894" vertical-scroll-proportion="0.622449" vertical-offset="586" max-vertical-offset="2329">
+        <state line="45" column="18" selection-start="1351" selection-end="1351" vertical-scroll-proportion="0.30442178" vertical-offset="586" max-vertical-offset="2329">
           <folding />
         </state>
       </provider>

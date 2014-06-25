@@ -43,7 +43,7 @@ def run_sonar(repository):
     folder_name = extract_folder_name(repository)
     repo_name = extract_repo_name(repository)
     sonar_properties = "projects/" + folder_name + "/sonar-" + repo_name + ".properties"
-    src_project = "projects/" + folder_name + find_src("projects/" + folder_name)
+    src_project = find_src("projects/" + folder_name)
     out, err, rcod = execute("cd projects && cd " + folder_name + " && cd " + repo_name + " && sonar-runner" +
                              " -Dproject.settings=" + sonar_properties +
                              " -Dsonar.sources=" + src_project)
