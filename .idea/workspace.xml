@@ -38,7 +38,7 @@
       <file leaf-file-name="verify_library.py" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/verify_library.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="45" column="18" selection-start="1351" selection-end="1351" vertical-scroll-proportion="0.30442178" vertical-offset="586" max-vertical-offset="2329">
+            <state line="46" column="30" selection-start="1417" selection-end="1417" vertical-scroll-proportion="0.6802721" vertical-offset="382" max-vertical-offset="2329">
               <folding />
             </state>
           </provider>
@@ -414,7 +414,11 @@
       <created>1403703384564</created>
       <updated>1403703384564</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Find src folder automatically">
+      <created>1403703516695</created>
+      <updated>1403703516695</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -527,7 +531,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/verify_library.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="45" column="18" selection-start="1351" selection-end="1351" vertical-scroll-proportion="0.30442178" vertical-offset="586" max-vertical-offset="2329">
+        <state line="46" column="30" selection-start="1417" selection-end="1417" vertical-scroll-proportion="0.6802721" vertical-offset="382" max-vertical-offset="2329">
           <folding />
         </state>
       </provider>
