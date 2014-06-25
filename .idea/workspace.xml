@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="932afae3-191d-4d40-a38a-3e1e38ebe60a" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/verifier.py" afterPath="$PROJECT_DIR$/verifier.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="repo-watcher.iws" />
@@ -25,19 +26,21 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="verifier.py" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="verifier.py" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/verifier.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="7" column="5" selection-start="268" selection-end="268" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="408">
-              <folding />
+            <state line="17" column="12" selection-start="636" selection-end="636" vertical-scroll-proportion="0.7487047" vertical-offset="0" max-vertical-offset="442">
+              <folding>
+                <element signature="e#0#28#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="verify_library.py" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="verify_library.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/verify_library.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="86" column="62" selection-start="2717" selection-end="2717" vertical-scroll-proportion="0.8111111" vertical-offset="1170" max-vertical-offset="2091">
+            <state line="86" column="39" selection-start="2694" selection-end="2694" vertical-scroll-proportion="-11.230769" vertical-offset="1170" max-vertical-offset="2091">
               <folding />
             </state>
           </provider>
@@ -57,8 +60,8 @@
     <option name="changedFiles">
       <list>
         <option value="$PROJECT_DIR$/config_vms.py" />
-        <option value="$PROJECT_DIR$/verifier.py" />
         <option value="$PROJECT_DIR$/verify_library.py" />
+        <option value="$PROJECT_DIR$/verifier.py" />
       </list>
     </option>
   </component>
@@ -260,7 +263,11 @@
       <created>1403666435474</created>
       <updated>1403666435474</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Little fix">
+      <created>1403666440036</created>
+      <updated>1403666440036</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -326,17 +333,19 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/verifier.py">
+    <entry file="file://$PROJECT_DIR$/verify_library.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="7" column="5" selection-start="268" selection-end="268" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="408">
+        <state line="86" column="39" selection-start="2694" selection-end="2694" vertical-scroll-proportion="-11.230769" vertical-offset="1170" max-vertical-offset="2091">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/verify_library.py">
+    <entry file="file://$PROJECT_DIR$/verifier.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="86" column="62" selection-start="2717" selection-end="2717" vertical-scroll-proportion="0.8111111" vertical-offset="1170" max-vertical-offset="2091">
-          <folding />
+        <state line="17" column="12" selection-start="636" selection-end="636" vertical-scroll-proportion="0.7487047" vertical-offset="0" max-vertical-offset="442">
+          <folding>
+            <element signature="e#0#28#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

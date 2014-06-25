@@ -1,4 +1,5 @@
 from verify_library import *
+from time import sleep
 print 'Opening repositories list...'
 with open('repositories.list', 'r') as repos_data:
     repositories = read_repos(repos_data)
@@ -14,5 +15,6 @@ while True:
     # Run sonar analysis only for repos with new commits
     print 'Rerunning sonar for certain repos...(if necessary)'
     run_sonar_for(repositories_with_new_commits)
+    sleep(2)
 
 
