@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="932afae3-191d-4d40-a38a-3e1e38ebe60a" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/verify_library.py" afterPath="$PROJECT_DIR$/verify_library.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="repo-watcher.iws" />
@@ -275,7 +274,11 @@
       <created>1403666599611</created>
       <updated>1403666599611</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="More fixes">
+      <created>1403666658501</created>
+      <updated>1403666658501</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="ToolWindowManager">
