@@ -14,6 +14,7 @@ while True:
     repositories_with_new_commits = update_all(repositories)
     # Run sonar analysis only for repos with new commits
     print 'Rerunning sonar for certain repos...(if necessary)'
+    print repositories_with_new_commits
     run_sonar_for(repositories_with_new_commits)
     sleep(2)
 

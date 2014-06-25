@@ -4,11 +4,13 @@ import subprocess
 def execute(command):
     """ Executes the command on a subprocess """
     cmd = command
+    print cmd
     process = subprocess.Popen(cmd,
                                shell=True,
                                stdout=subprocess.PIPE,
                                stderr=subprocess.STDOUT)
     out, err = process.communicate()
+    print out
     return out, err, process.returncode
 
 
@@ -51,8 +53,9 @@ def run_sonar(repository):
 def clone_all(repositories):
     """ Clone all the repositories in the list"""
     for repo in repositories:
-        if not is_already_cloned(repo):
-            clone(repo)
+        print is_already_cloned(repo)
+	if not is_already_cloned(repo):
+           print clone(repo)
         config_properties(repo)
 
 def config_properties(repo):
@@ -83,7 +86,7 @@ def is_already_cloned(repository):
 def clone(repository):
     """ Clones the given repository"""
     folder_name = extract_folder_name(repository)
-    execute("mkdir " + folder_name)
+    print execute("mkdir " + folder_name)
     out, err, rcod = execute("cd " + folder_name + " && git clone " + repository)
     return out
 
