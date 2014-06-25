@@ -40,7 +40,7 @@
       <file leaf-file-name="verify_library.py" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/verify_library.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="84" column="49" selection-start="2618" selection-end="2618" vertical-scroll-proportion="0.39323843" vertical-offset="1207" max-vertical-offset="2091">
+            <state line="86" column="56" selection-start="2711" selection-end="2711" vertical-scroll-proportion="0.45373666" vertical-offset="1207" max-vertical-offset="2091">
               <folding />
             </state>
           </provider>
@@ -271,7 +271,11 @@
       <created>1403666513775</created>
       <updated>1403666513775</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="More fixes">
+      <created>1403666599611</created>
+      <updated>1403666599611</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -314,7 +318,8 @@
     <MESSAGE value="Changing repo commands" />
     <MESSAGE value="Little fix" />
     <MESSAGE value="Shrinking time between updates" />
-    <option name="LAST_COMMIT_MESSAGE" value="Shrinking time between updates" />
+    <MESSAGE value="More fixes" />
+    <option name="LAST_COMMIT_MESSAGE" value="More fixes" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -349,7 +354,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/verify_library.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="84" column="49" selection-start="2618" selection-end="2618" vertical-scroll-proportion="0.39323843" vertical-offset="1207" max-vertical-offset="2091">
+        <state line="86" column="56" selection-start="2711" selection-end="2711" vertical-scroll-proportion="0.45373666" vertical-offset="1207" max-vertical-offset="2091">
           <folding />
         </state>
       </provider>
