@@ -59,6 +59,8 @@ def clone_all(repositories):
         if not is_already_cloned(repo):
             print clone(repo)
             config_properties(repo)
+        else:
+            new_repos.append(repo)
     return new_repos
 
 def config_properties(repo):
@@ -74,7 +76,7 @@ sonar.projectName=%s
 sonar.projectVersion=1.0
 sonar.language=java
 sonar.sourceEncoding=UTF-8
-    """ % (repo_name, repo_name)
+    """ % (repo_name + "-" + folder_name, repo_name + "-" + folder_name)
 
     execute("echo '" + properties + "' > projects/" + folder_name + "/sonar-" + repo_name + ".properties")
 

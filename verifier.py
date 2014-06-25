@@ -7,6 +7,8 @@ print 'Done!'
 print 'Cloning all repositories list'
 # Try to clone all repositories if they don't exist
 new_repositories = clone_all(repositories)
+print 'new:'
+print new_repositories
 run_sonar_for(new_repositories)
 print 'Done!'
 while True:
