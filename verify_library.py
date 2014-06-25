@@ -43,11 +43,18 @@ def run_sonar(repository):
     folder_name = extract_folder_name(repository)
     repo_name = extract_repo_name(repository)
     sonar_properties = "projects/" + folder_name + "/sonar-" + repo_name + ".properties"
-    src_project = folder_name
+    src_project = "projects/" + folder_name + find_src("projects/" + folder_name)
     out, err, rcod = execute("cd projects && cd " + folder_name + " && cd " + repo_name + " && sonar-runner" +
                              " -Dproject.settings=" + sonar_properties +
                              " -Dsonar.sources=" + src_project)
     return out
+
+def find_src(directory):
+    import os
+    for root, dirs, files in os.walk(directory):
+        for dir in dirs:
+            if os.path.join(root, dir).endswith("app"):
+                return os.path.join(root, dir)
 
 
 def clone_all(repositories):
