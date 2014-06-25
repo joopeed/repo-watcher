@@ -6,7 +6,8 @@ with open('repositories.list', 'r') as repos_data:
 print 'Done!'
 print 'Cloning all repositories list'
 # Try to clone all repositories if they don't exist
-clone_all(repositories)
+new_repositories = clone_all(repositories)
+run_sonar_for(new_repositories)
 print 'Done!'
 while True:
     print 'Updating repos...'

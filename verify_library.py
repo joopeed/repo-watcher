@@ -42,9 +42,9 @@ def run_sonar(repository):
     """ Run sonar for the given repository"""
     folder_name = extract_folder_name(repository)
     repo_name = extract_repo_name(repository)
-    sonar_properties = folder_name + "/sonar-" + repo_name + ".properties"
+    sonar_properties = "projects/" + folder_name + "/sonar-" + repo_name + ".properties"
     src_project = folder_name
-    out, err, rcod = execute("cd " + folder_name + " && cd " + repo_name + " && sonar-runner" +
+    out, err, rcod = execute("cd projects && cd " + folder_name + " && cd " + repo_name + " && sonar-runner" +
                              " -Dproject.settings=" + sonar_properties +
                              " -Dsonar.sources=" + src_project)
     return out
@@ -52,11 +52,13 @@ def run_sonar(repository):
 
 def clone_all(repositories):
     """ Clone all the repositories in the list"""
+    new_repos = []
     for repo in repositories:
         print is_already_cloned(repo)
-	if not is_already_cloned(repo):
-           print clone(repo)
-        config_properties(repo)
+        if not is_already_cloned(repo):
+            print clone(repo)
+            config_properties(repo)
+    return new_repos
 
 def config_properties(repo):
     """
@@ -73,21 +75,21 @@ sonar.language=java
 sonar.sourceEncoding=UTF-8
     """ % (repo_name, repo_name)
 
-    execute("echo '" + properties + "' > " + folder_name + "/sonar-" + repo_name + ".properties")
+    execute("echo '" + properties + "' > projects/" + folder_name + "/sonar-" + repo_name + ".properties")
 
 
 def is_already_cloned(repository):
     """ Returns whether a repository already exists"""
     folder_name = extract_folder_name(repository)
-    out, err, rcod = execute("ls | grep " + folder_name + " | grep -v grep")
-    return not not out
+    out, err, rcod = execute("ls projects | grep " + folder_name + " | grep -v grep")
+    return out
 
 
 def clone(repository):
     """ Clones the given repository"""
     folder_name = extract_folder_name(repository)
-    print execute("mkdir " + folder_name)
-    out, err, rcod = execute("cd " + folder_name + " && git clone " + repository)
+    print execute("cd projects && mkdir " + folder_name)
+    out, err, rcod = execute("cd projects && cd " + folder_name + " && git clone " + repository)
     return out
 
 
@@ -98,7 +100,7 @@ def update_repo(repository):
     folder_name = extract_folder_name(repository)
     repo_name = extract_repo_name(repository)
     out, err, rcod = execute(
-        "cd " + folder_name + " && cd " + repo_name + " && git pull | grep \"Already up-to-date.\" | grep -v grep")
+        "cd projects && cd " + folder_name + " && cd " + repo_name + " && git pull | grep \"Already up-to-date.\" | grep -v grep")
     return not out
 
 
