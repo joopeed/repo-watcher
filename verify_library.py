@@ -53,6 +53,7 @@ def run_sonar(repository):
 def clone_all(repositories):
     """ Clone all the repositories in the list"""
     new_repos = []
+    execute("mkdir projects")
     for repo in repositories:
         print is_already_cloned(repo)
         if not is_already_cloned(repo):
