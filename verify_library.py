@@ -16,7 +16,7 @@ def read_repos(repos_data):
     """ Reads a repositories.list file and returns a list of repos"""
     repos = []
     for line in repos_data:
-        repos = line
+        repos.append(line)
     return repos
 
 
@@ -42,7 +42,7 @@ def run_sonar(repository):
     repo_name = extract_repo_name(repository)
     sonar_properties = folder_name + "/sonar-" + repo_name + ".properties"
     src_project = folder_name
-    out, err, rcod = execute("cd " + folder_name + " | cd " + repo_name + " | sonar-runner" +
+    out, err, rcod = execute("cd " + folder_name + " && cd " + repo_name + " && sonar-runner" +
                              " -Dproject.settings=" + sonar_properties +
                              " -Dsonar.sources=" + src_project)
     return out
@@ -63,13 +63,11 @@ def config_properties(repo):
     folder_name = extract_folder_name(repo)
     repo_name = extract_repo_name(repo)
     properties = """
-    sonar.projectKey=%s
-    sonar.projectName=%s
-    sonar.projectVersion=1.0
-
-    sonar.language=java
-
-    sonar.sourceEncoding=UTF-8
+sonar.projectKey=%s
+sonar.projectName=%s
+sonar.projectVersion=1.0
+sonar.language=java
+sonar.sourceEncoding=UTF-8
     """ % (repo_name, repo_name)
 
     execute("echo '" + properties + "' > " + folder_name + "/sonar-" + repo_name + ".properties")
@@ -86,7 +84,7 @@ def clone(repository):
     """ Clones the given repository"""
     folder_name = extract_folder_name(repository)
     execute("mkdir " + folder_name)
-    out, err, rcod = execute("cd " + folder_name + " | git clone " + repository)
+    out, err, rcod = execute("git clone " + repository + " " +  + folder_name )
     return out
 
 
@@ -97,7 +95,7 @@ def update_repo(repository):
     folder_name = extract_folder_name(repository)
     repo_name = extract_repo_name(repository)
     out, err, rcod = execute(
-        "cd " + folder_name + " | cd " + repo_name + " | git pull | grep \"Already up-to-date.\" | grep -v grep")
+        "cd " + folder_name + " && cd " + repo_name + " && git pull | grep \"Already up-to-date.\" | grep -v grep")
     return not out
 
 
