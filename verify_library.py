@@ -59,7 +59,6 @@ def clone_all(repositories):
         if not is_already_cloned(repo):
             print clone(repo)
             config_properties(repo)
-        else:
             new_repos.append(repo)
     return new_repos
 

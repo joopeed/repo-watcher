@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="932afae3-191d-4d40-a38a-3e1e38ebe60a" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/verifier.py" afterPath="$PROJECT_DIR$/verifier.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/verify_library.py" afterPath="$PROJECT_DIR$/verify_library.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
@@ -39,7 +38,7 @@
       <file leaf-file-name="verify_library.py" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/verify_library.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="61" column="13" selection-start="1943" selection-end="1943" vertical-scroll-proportion="0.5935374" vertical-offset="688" max-vertical-offset="2227">
+            <state line="60" column="35" selection-start="1929" selection-end="1929" vertical-scroll-proportion="0.56462586" vertical-offset="688" max-vertical-offset="2210">
               <folding />
             </state>
           </provider>
@@ -403,7 +402,11 @@
       <created>1403702267613</created>
       <updated>1403702267613</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Running sonar for every first run">
+      <created>1403702680124</created>
+      <updated>1403702680124</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -515,7 +518,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/verify_library.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="61" column="13" selection-start="1943" selection-end="1943" vertical-scroll-proportion="0.5935374" vertical-offset="688" max-vertical-offset="2227">
+        <state line="60" column="35" selection-start="1929" selection-end="1929" vertical-scroll-proportion="0.56462586" vertical-offset="688" max-vertical-offset="2210">
           <folding />
         </state>
       </provider>
