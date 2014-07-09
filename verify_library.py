@@ -43,7 +43,7 @@ def run_sonar(repository):
     folder_name = extract_folder_name(repository)
     repo_name = extract_repo_name(repository)
     sonar_properties = "projects/" + folder_name + "/sonar-" + repo_name + ".properties"
-    src_project = find_src("projects/" + folder_name)
+    src_project = find_src("projects/" + folder_name + "/" + repo_name)
     out, err, rcod = execute("sonar-runner" +
                              " -Dproject.settings=" + sonar_properties +
                              " -Dsonar.sources=" + src_project)
@@ -55,6 +55,7 @@ def find_src(directory):
         for dir in dirs:
             if os.path.join(root, dir).endswith("app"):
                 return os.path.join(root, dir)
+    return "."
 
 
 def clone_all(repositories):
@@ -90,14 +91,17 @@ sonar.sourceEncoding=UTF-8
 def is_already_cloned(repository):
     """ Returns whether a repository already exists"""
     folder_name = extract_folder_name(repository)
-    out, err, rcod = execute("ls projects | grep " + folder_name + " | grep -v grep")
+    repo_name = extract_repo_name(repository)
+    out, err, rcod = execute("ls projects | grep -x " + folder_name + " | grep -v grep")
+    if out:
+	out, err, rcod = execute("cd projects && cd " + folder_name + " && ls | grep -x " + repo_name + " | grep -v grep")
     return out
 
 
 def clone(repository):
     """ Clones the given repository"""
     folder_name = extract_folder_name(repository)
-    print execute("cd projects && mkdir " + folder_name)
+    print execute("cd projects && mkdir -p " + folder_name)
     out, err, rcod = execute("cd projects && cd " + folder_name + " && git clone " + repository)
     return out
 
@@ -128,4 +132,4 @@ def extract_repo_name(repository):
     https://github.com/joopeed/sonar-repo-watcher.git
     Repo name is sonar-repo-watcher
     """
-    return repository.split('/')[4].split('.')[0]
+    return ".".join(repository.split('/')[4].split('.')[:-1])

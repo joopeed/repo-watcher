@@ -19,6 +19,6 @@ while True:
     print 'Rerunning sonar for certain repos...(if necessary)'
     print repositories_with_new_commits
     run_sonar_for(repositories_with_new_commits)
-    sleep(2)
+    sleep(3600)
 
 
