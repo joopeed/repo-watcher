@@ -4,7 +4,7 @@ import BaseHTTPServer
 import socket
 from hooks_handler import HooksHandler
 
-port = 8080
+port = 8080 # PORT receiving webhooks
 
 def run(server_class=BaseHTTPServer.HTTPServer, handler_class=BaseHTTPServer.BaseHTTPRequestHandler):
         server_address = ('', port)
