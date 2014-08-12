@@ -1,5 +1,7 @@
 import subprocess
-
+# Folder with Java files to analyze
+# The target will be searched in the repository
+TARGET_FOLDER = "app"
 
 def execute(command):
     """ Executes the command on a subprocess """
@@ -53,7 +55,7 @@ def find_src(directory):
     import os
     for root, dirs, files in os.walk(directory):
         for dir in dirs:
-            if os.path.join(root, dir).endswith("app"):
+            if os.path.join(root, dir).endswith(TARGET_FOLDER):
                 return os.path.join(root, dir)
     return "."
 
